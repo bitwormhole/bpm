@@ -1,5 +1,8 @@
-module github.com/bitwormhole/go-wormhole-bpm
+module github.com/bitwormhole/bpm
 
-go 1.15
+go 1.16
 
-require github.com/bitwormhole/go-wormhole-core v0.0.0-20210118102432-3b423643e831
+require (
+	github.com/bitwormhole/starter v0.0.67
+	github.com/bitwormhole/starter-cli v0.0.5 // indirect
+)
