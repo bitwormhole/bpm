@@ -12,13 +12,14 @@ import (
 
 const (
 	myModuleName = "github.com/bitwormhole/bpm"
-	myModuleVer  = "v0"
-	myModuleRev  = 0
+	myModuleVer  = "v0.0.1"
+	myModuleRev  = 1
 )
 
 //go:embed src/main/resources
 var theMainRes embed.FS
 
+// Module 导出模块【github.com/bitwormhole/bpm】
 func Module() application.Module {
 
 	mb := application.ModuleBuilder{}
