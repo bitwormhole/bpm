@@ -13,5 +13,18 @@ type ManifestItem struct {
 // ManifestMeta 文件清单元数据（主要是包信息）
 type ManifestMeta struct {
 	BasePackageInfo
-	MainPath string
+	MainPath              string
+	SignatureAlgorithm    string
+	SignaturePublicFinger string // 公钥指纹
+	SignaturePublicKey    string // path to key file
+	SignaturePrivateKey   string // path to key file
+}
+
+type SignatureInfo struct {
+	BasePackageInfo
+
+	Secret       string
+	Plain        string
+	Algorithm    string
+	PublicFinger string // 公钥指纹
 }

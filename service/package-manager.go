@@ -1,7 +1,6 @@
 package service
 
 import (
-	"crypto/sha256"
 	"errors"
 	"strings"
 
@@ -11,7 +10,6 @@ import (
 	"github.com/bitwormhole/starter/collection"
 	"github.com/bitwormhole/starter/io/fs"
 	"github.com/bitwormhole/starter/markup"
-	"github.com/bitwormhole/starter/util"
 )
 
 // PackageManager 包管理器
@@ -26,8 +24,6 @@ type PackageManager interface {
 
 	SelectAvailablePackages(namelist []string) ([]*entity.AvailablePackageInfo, error)
 	SelectInstalledPackages(namelist []string) ([]*entity.InstalledPackageInfo, error)
-
-	ComputeSHA256sum(file fs.Path) (string, error)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -134,16 +130,16 @@ func (inst *PackageManagerImpl) loadProperties(file fs.Path) (collection.Propert
 	return collection.ParseProperties(text, nil)
 }
 
-// ComputeSHA256sum ...
-func (inst *PackageManagerImpl) ComputeSHA256sum(file fs.Path) (string, error) {
-	data, err := file.GetIO().ReadBinary(nil)
-	if err != nil {
-		return "", err
-	}
-	sum := sha256.Sum256(data)
-	str := util.StringifyBytes(sum[:])
-	return str, nil
-}
+// // ComputeSHA256sum ...
+// func (inst *PackageManagerImpl) ComputeSHA256sum(file fs.Path) (string, error) {
+// 	data, err := file.GetIO().ReadBinary(nil)
+// 	if err != nil {
+// 		return "", err
+// 	}
+// 	sum := sha256.Sum256(data)
+// 	str := util.StringifyBytes(sum[:])
+// 	return str, nil
+// }
 
 // SelectAvailablePackages ...
 func (inst *PackageManagerImpl) SelectAvailablePackages(namelist []string) ([]*entity.AvailablePackageInfo, error) {

@@ -8,6 +8,7 @@ import (
 	"github.com/bitwormhole/bpm/data/entity"
 	"github.com/bitwormhole/bpm/data/po"
 	"github.com/bitwormhole/bpm/data/vo"
+	"github.com/bitwormhole/bpm/tools"
 	"github.com/bitwormhole/starter-cli/cli"
 	"github.com/bitwormhole/starter/collection"
 	"github.com/bitwormhole/starter/io/fs"
@@ -230,7 +231,7 @@ func (inst *deployServiceTask) unzipToTempDir() error {
 	if !to.Exists() {
 		to.Mkdirs()
 	}
-	return convert.Unzip(from, to)
+	return tools.Unzip(from, to)
 }
 
 func (inst *deployServiceTask) loadPropertiesFile(file fs.Path) (string, collection.Properties, error) {
@@ -309,7 +310,7 @@ func (inst *deployServiceTask) checkFilesInPackage() error {
 		wantSum := item.SHA256
 		wantSize := item.Size
 
-		haveSum, err := inst.parent.PM.ComputeSHA256sum(node)
+		haveSum, err := tools.ComputeSHA256sum(node)
 		if err != nil {
 			return err
 		}
@@ -353,7 +354,7 @@ func (inst *deployServiceTask) moveFilesToDestination() error {
 		}
 
 		// check
-		haveSum, err := inst.parent.PM.ComputeSHA256sum(dstNode)
+		haveSum, err := tools.ComputeSHA256sum(dstNode)
 		if err != nil {
 			return err
 		}
@@ -369,7 +370,9 @@ func (inst *deployServiceTask) saveMetaToInstalled() error {
 
 	pm := inst.parent.PM
 	nextlist := make([]*entity.InstalledPackageInfo, 0)
+	pack0 := inst.pack80
 	pack2 := inst.pack82
+	manifest := &inst.manifest
 
 	// load prev
 	prev, err := pm.LoadInstalledPackages()
@@ -384,6 +387,12 @@ func (inst *deployServiceTask) saveMetaToInstalled() error {
 			nextlist = append(nextlist, item)
 		}
 	}
+
+	// value of newer
+	if pack0 != nil {
+		pack2.AutoUpgrade = pack0.AutoUpgrade
+	}
+	pack2.MainPath = manifest.Meta.MainPath
 
 	// append newer
 	nextlist = append(nextlist, pack2)

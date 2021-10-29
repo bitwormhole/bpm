@@ -14,6 +14,7 @@ type BasePackageInfo struct {
 	Revision     int
 	Size         int64
 	Date         int64
+	DateString   string
 }
 
 // AvailablePackageInfo 表示可安装的包

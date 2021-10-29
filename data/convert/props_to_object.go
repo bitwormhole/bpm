@@ -24,7 +24,13 @@ func LoadPackageManifest(o *po.Manifest, props collection.Properties) error {
 		list = append(list, item)
 	}
 	o.Items = list
-	return nil
+	return doManifestMetaLS(save, &o.Meta, props)
+}
+
+// LoadPackageSignature ...
+func LoadPackageSignature(o *po.Signature, props collection.Properties) error {
+	const save = false
+	return doSignatureInfoLS(save, &o.Info, props)
 }
 
 // LoadPackageSourceList ...
@@ -131,7 +137,13 @@ func SavePackageManifest(o *po.Manifest, props collection.Properties) error {
 			return err
 		}
 	}
-	return nil
+	return doManifestMetaLS(save, &o.Meta, props)
+}
+
+// SavePackageSignature 保存包项目清单
+func SavePackageSignature(o *po.Signature, props collection.Properties) error {
+	const save = true
+	return doSignatureInfoLS(save, &o.Info, props)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -164,6 +176,7 @@ func doAvailablePackagesItemLS(save bool, id string, o *entity.AvailablePackageI
 	a.ForString(&o.Type, "content-type")
 	a.ForString(&o.URL, "url")
 	a.ForString(&o.Version, "version")
+	a.ForString(&o.DateString, "date-text")
 
 	a.ForInt64(&o.Date, "date")
 	a.ForInt64(&o.Size, "size")
@@ -233,6 +246,7 @@ func doInstalledPackagesItemLS(save bool, id string, o *entity.InstalledPackageI
 	a.ForString(&o.Dependencies, "dependencies")
 	a.ForString(&o.Platform, "platform")
 	a.ForString(&o.MainPath, "main")
+	a.ForString(&o.DateString, "date-text")
 
 	a.ForInt(&o.Revision, "revision")
 	a.ForBool(&o.AutoUpgrade, "auto-upgrade")
@@ -302,6 +316,31 @@ func doSourceListItemLS(save bool, id string, o *entity.PackSource, props collec
 	return nil
 }
 
+func doSignatureInfoLS(save bool, o *entity.SignatureInfo, props collection.Properties) error {
+
+	const id = ""
+	a := makeAdapterFor(save, props).Type("signature").ID(id).Create()
+	o.ID = id
+
+	a.ForString(&o.ID, "id")
+	a.ForString(&o.Name, "name")
+	a.ForString(&o.Type, "content-type")
+	a.ForString(&o.URL, "url")
+	a.ForString(&o.SHA256, "sha256sum")
+	a.ForString(&o.Version, "version")
+	a.ForString(&o.Dependencies, "dependencies")
+	a.ForString(&o.Platform, "platform")
+	a.ForString(&o.DateString, "date-text")
+
+	a.ForString(&o.Algorithm, "algorithm")
+	a.ForString(&o.PublicFinger, "public-key-fingerprint")
+	a.ForString(&o.Plain, "plain")
+	a.ForString(&o.Secret, "secret")
+
+	o.ID = id
+	return nil
+}
+
 func doManifestMetaLS(save bool, o *entity.ManifestMeta, props collection.Properties) error {
 
 	const id = ""
@@ -317,10 +356,16 @@ func doManifestMetaLS(save bool, o *entity.ManifestMeta, props collection.Proper
 	a.ForString(&o.Dependencies, "dependencies")
 	a.ForString(&o.Platform, "platform")
 	a.ForString(&o.MainPath, "main")
+	a.ForString(&o.DateString, "date-text")
 
 	a.ForInt(&o.Revision, "revision")
 	a.ForInt64(&o.Size, "size")
 	a.ForInt64(&o.Date, "date")
+
+	a.ForString(&o.SignatureAlgorithm, "signature-algorithm")
+	a.ForString(&o.SignaturePublicFinger, "signature-public-key-fingerprint")
+	a.ForString(&o.SignaturePublicKey, "signature-public-key")
+	a.ForString(&o.SignaturePrivateKey, "signature-private-key")
 
 	o.ID = id
 	return nil

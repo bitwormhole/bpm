@@ -8,6 +8,7 @@ import (
 
 	"github.com/bitwormhole/bpm/data/entity"
 	"github.com/bitwormhole/bpm/data/vo"
+	"github.com/bitwormhole/bpm/tools"
 	"github.com/bitwormhole/starter-cli/cli"
 	"github.com/bitwormhole/starter/io/fs"
 	"github.com/bitwormhole/starter/markup"
@@ -152,7 +153,7 @@ func (inst *fetchServiceTask) existsFile(file fs.Path, wantSum string) bool {
 	if !file.Exists() {
 		return false
 	}
-	haveSum, err := inst.parent.PM.ComputeSHA256sum(file)
+	haveSum, err := tools.ComputeSHA256sum(file)
 	if err != nil {
 		return false
 	}
