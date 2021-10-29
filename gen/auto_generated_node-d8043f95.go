@@ -30,8 +30,22 @@ type pComFetchServiceImpl struct {
 type pComInstallServiceImpl struct {
 	instance *service0xa5f732.InstallServiceImpl
 	 markup0x23084a.Component `id:"bpm-install-service" class:"bpm-service"`
-	Fetch service0xa5f732.FetchService `inject:"#bpm-fetch-service"`
-	Deploy service0xa5f732.DeployService `inject:"#bpm-deploy-service"`
+	PM service0xa5f732.PackageManager `inject:"#bpm-package-manager"`
+	FetchSer service0xa5f732.FetchService `inject:"#bpm-fetch-service"`
+	DeploySer service0xa5f732.DeployService `inject:"#bpm-deploy-service"`
+}
+
+
+type pComMakeServiceImpl struct {
+	instance *service0xa5f732.MakeServiceImpl
+	 markup0x23084a.Component `id:"bpm-make-service" class:"bpm-service"`
+}
+
+
+type pComPackInfoServiceImpl struct {
+	instance *service0xa5f732.PackInfoServiceImpl
+	 markup0x23084a.Component `id:"bpm-pack-info-service" class:"bpm-service"`
+	PM service0xa5f732.PackageManager `inject:"#bpm-package-manager"`
 }
 
 
@@ -52,6 +66,9 @@ type pComUpdateServiceImpl struct {
 type pComUpgradeServiceImpl struct {
 	instance *service0xa5f732.UpgradeServiceImpl
 	 markup0x23084a.Component `id:"bpm-upgrade-service" class:"bpm-service"`
+	PM service0xa5f732.PackageManager `inject:"#bpm-package-manager"`
+	FetchSer service0xa5f732.FetchService `inject:"#bpm-fetch-service"`
+	DeploySer service0xa5f732.DeployService `inject:"#bpm-deploy-service"`
 }
 
 

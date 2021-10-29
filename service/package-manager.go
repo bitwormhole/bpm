@@ -122,7 +122,7 @@ func (inst *PackageManagerImpl) SaveAvailablePackages(o *po.AvailablePackages) e
 }
 
 func (inst *PackageManagerImpl) saveProperties(p collection.Properties, file fs.Path) error {
-	text := collection.FormatProperties(p)
+	text := collection.FormatPropertiesWithSegment(p)
 	return file.GetIO().WriteText(text, nil, true)
 }
 

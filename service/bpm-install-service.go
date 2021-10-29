@@ -23,8 +23,9 @@ type InstallService interface {
 type InstallServiceImpl struct {
 	markup.Component `id:"bpm-install-service" class:"bpm-service"`
 
-	Fetch  FetchService  `inject:"#bpm-fetch-service"`
-	Deploy DeployService `inject:"#bpm-deploy-service"`
+	PM        PackageManager `inject:"#bpm-package-manager"`
+	FetchSer  FetchService   `inject:"#bpm-fetch-service"`
+	DeploySer DeployService  `inject:"#bpm-deploy-service"`
 }
 
 func (inst *InstallServiceImpl) _Impl() InstallService {
@@ -38,27 +39,43 @@ func (inst *InstallServiceImpl) Install(ctx context.Context, in *vo.Install, out
 
 // InstallPackage ...
 func (inst *InstallServiceImpl) InstallPackage(ctx context.Context, pack *entity.AvailablePackageInfo) error {
-	err := inst.Fetch.FetchPackage(ctx, pack)
-	if err != nil {
-		return err
-	}
-	return inst.Deploy.DeployPackage(ctx, pack)
+	list := []*entity.AvailablePackageInfo{pack}
+	return inst.doInstallAll(ctx, list)
 }
 
 // InstallPackages ...
 func (inst *InstallServiceImpl) InstallPackages(ctx context.Context, packs []*entity.AvailablePackageInfo) error {
-	err := inst.Fetch.FetchPackages(ctx, packs)
-	if err != nil {
-		return err
-	}
-	return inst.Deploy.DeployPackages(ctx, packs)
+	return inst.doInstallAll(ctx, packs)
 }
 
 // InstallByNames ...
 func (inst *InstallServiceImpl) InstallByNames(ctx context.Context, names []string) error {
-	err := inst.Fetch.FetchByNames(ctx, names)
+	packs, err := inst.PM.SelectAvailablePackages(names)
 	if err != nil {
 		return err
 	}
-	return inst.Deploy.DeployByNames(ctx, names)
+	return inst.doInstallAll(ctx, packs)
+}
+
+func (inst *InstallServiceImpl) doInstallAll(ctx context.Context, packs []*entity.AvailablePackageInfo) error {
+	err := inst.doFetchAll(ctx, packs)
+	if err != nil {
+		return err
+	}
+	return inst.doDeployAll(ctx, packs)
+}
+
+func (inst *InstallServiceImpl) doFetchAll(ctx context.Context, packs []*entity.AvailablePackageInfo) error {
+	return inst.FetchSer.FetchPackages(ctx, packs)
+}
+
+func (inst *InstallServiceImpl) doDeployAll(ctx context.Context, packs []*entity.AvailablePackageInfo) error {
+	return inst.DeploySer.DeployPackages(ctx, packs, inst)
+}
+
+func (inst *InstallServiceImpl) AcceptDeploy(prev *entity.InstalledPackageInfo, next *entity.AvailablePackageInfo) bool {
+	if prev != nil {
+		return false // 如果已经安装，那么就不能重复安装
+	}
+	return true
 }

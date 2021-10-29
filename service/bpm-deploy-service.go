@@ -15,13 +15,18 @@ import (
 	"github.com/bitwormhole/starter/vlog"
 )
 
+// DeployPackageFilter 在部署时过滤安装包
+type DeployPackageFilter interface {
+	AcceptDeploy(prev *entity.InstalledPackageInfo, next *entity.AvailablePackageInfo) bool
+}
+
 // DeployService 部署已缓存的bpm包
 type DeployService interface {
 	Deploy(ctx context.Context, in *vo.Deploy, out *vo.Deploy) error
 
-	DeployPackage(ctx context.Context, pack *entity.AvailablePackageInfo) error
-	DeployPackages(ctx context.Context, packs []*entity.AvailablePackageInfo) error
-	DeployByNames(ctx context.Context, names []string) error
+	DeployPackage(ctx context.Context, pack *entity.AvailablePackageInfo, filter DeployPackageFilter) error
+	DeployPackages(ctx context.Context, packs []*entity.AvailablePackageInfo, filter DeployPackageFilter) error
+	DeployByNames(ctx context.Context, names []string, filter DeployPackageFilter) error
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -36,11 +41,11 @@ type DeployServiceImpl struct {
 
 // Deploy ...
 func (inst *DeployServiceImpl) Deploy(ctx context.Context, in *vo.Deploy, out *vo.Deploy) error {
-	return inst.DeployByNames(ctx, in.PackageNames)
+	return inst.DeployByNames(ctx, in.PackageNames, nil)
 }
 
 // DeployPackage ...
-func (inst *DeployServiceImpl) DeployPackage(ctx context.Context, pack *entity.AvailablePackageInfo) error {
+func (inst *DeployServiceImpl) DeployPackage(ctx context.Context, pack *entity.AvailablePackageInfo, filter DeployPackageFilter) error {
 
 	console, err := cli.GetConsole(ctx)
 	if err != nil {
@@ -51,15 +56,16 @@ func (inst *DeployServiceImpl) DeployPackage(ctx context.Context, pack *entity.A
 	task.parent = inst
 	task.context = ctx
 	task.console = console
-	task.pack1 = pack
+	task.pack81 = pack
+	task.filter = filter
 
 	return task.run()
 }
 
 // DeployPackages ...
-func (inst *DeployServiceImpl) DeployPackages(ctx context.Context, packs []*entity.AvailablePackageInfo) error {
+func (inst *DeployServiceImpl) DeployPackages(ctx context.Context, packs []*entity.AvailablePackageInfo, filter DeployPackageFilter) error {
 	for _, pack := range packs {
-		err := inst.DeployPackage(ctx, pack)
+		err := inst.DeployPackage(ctx, pack, filter)
 		if err != nil {
 			vlog.Warn(err)
 		}
@@ -68,12 +74,12 @@ func (inst *DeployServiceImpl) DeployPackages(ctx context.Context, packs []*enti
 }
 
 // DeployByNames ...
-func (inst *DeployServiceImpl) DeployByNames(ctx context.Context, names []string) error {
+func (inst *DeployServiceImpl) DeployByNames(ctx context.Context, names []string, filter DeployPackageFilter) error {
 	packs, err := inst.PM.SelectAvailablePackages(names)
 	if err != nil {
 		return err
 	}
-	return inst.DeployPackages(ctx, packs)
+	return inst.DeployPackages(ctx, packs, filter)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -82,9 +88,11 @@ type deployServiceTask struct {
 	parent  *DeployServiceImpl
 	context context.Context
 	console cli.Console
+	filter  DeployPackageFilter
 
-	pack1 *entity.AvailablePackageInfo
-	pack2 *entity.InstalledPackageInfo
+	pack80 *entity.InstalledPackageInfo // 已安装的包
+	pack81 *entity.AvailablePackageInfo // 将要安装的包
+	pack82 *entity.InstalledPackageInfo // 完成安装的包
 
 	bpmFiles *LocalBpmFiles
 	manifest po.Manifest
@@ -97,20 +105,26 @@ type deployServiceTask struct {
 
 func (inst *deployServiceTask) run() error {
 
-	name := inst.pack1.Name
+	err := inst.init()
+	if err != nil {
+		return err
+	}
 
-	if inst.hasInstalled() {
-		inst.console.WriteString("package [" + name + "] is installed.\n")
+	// 检查是否需要skip当前的部署
+	inst.loadPack80()
+	if !inst.filter.AcceptDeploy(inst.pack80, inst.pack81) {
+		name := inst.pack81.Name
+		inst.console.WriteString("skip deploy " + name + "\n")
 		return nil
 	}
 
-	err := inst.prepareDirs()
+	err = inst.prepareDirs()
 	if err != nil {
 		return err
 	}
 	defer inst.clearTempDir()
 
-	err = inst.preparePack2()
+	err = inst.preparePack82()
 	if err != nil {
 		return err
 	}
@@ -149,21 +163,33 @@ func (inst *deployServiceTask) run() error {
 	return nil
 }
 
-func (inst *deployServiceTask) hasInstalled() bool {
-	name := inst.pack1.Name
+func (inst *deployServiceTask) init() error {
+	if inst.filter == nil {
+		inst.filter = inst
+	}
+	return nil
+}
+
+func (inst *deployServiceTask) AcceptDeploy(installed *entity.InstalledPackageInfo, available *entity.AvailablePackageInfo) bool {
+	return true
+}
+
+func (inst *deployServiceTask) loadPack80() error {
+	pack1 := inst.pack81
+	name := pack1.Name
 	namelist := []string{name}
 	packs, err := inst.parent.PM.SelectInstalledPackages(namelist)
 	if err == nil {
-		if len(packs) > 0 {
-			return true
+		for _, item := range packs {
+			inst.pack80 = item
 		}
 	}
-	return false
+	return nil
 }
 
-func (inst *deployServiceTask) preparePack2() error {
+func (inst *deployServiceTask) preparePack82() error {
 
-	pack1 := inst.pack1
+	pack1 := inst.pack81
 	pack2 := &entity.InstalledPackageInfo{}
 
 	pack2.Name = pack1.Name
@@ -177,13 +203,13 @@ func (inst *deployServiceTask) preparePack2() error {
 	pack2.File = inst.bpmFiles.BPM.Path()
 	pack2.AutoUpgrade = false
 
-	inst.pack2 = pack2
+	inst.pack82 = pack2
 	return nil
 }
 
 func (inst *deployServiceTask) prepareDirs() error {
 
-	files := inst.parent.Env.GetLocalBpmFiles(&inst.pack1.BasePackageInfo)
+	files := inst.parent.Env.GetLocalBpmFiles(&inst.pack81.BasePackageInfo)
 	tmpDir := files.Dir.GetChild(".unzip.tmp.d")
 	dotbpm := tmpDir.GetChild(".bpm")
 	manifest := dotbpm.GetChild("manifest")
@@ -343,7 +369,7 @@ func (inst *deployServiceTask) saveMetaToInstalled() error {
 
 	pm := inst.parent.PM
 	nextlist := make([]*entity.InstalledPackageInfo, 0)
-	pack2 := inst.pack2
+	pack2 := inst.pack82
 
 	// load prev
 	prev, err := pm.LoadInstalledPackages()

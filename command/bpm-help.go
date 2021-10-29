@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"github.com/bitwormhole/starter-cli/cli"
+	"github.com/bitwormhole/starter-cli/handlers"
 	"github.com/bitwormhole/starter/markup"
 )
 
@@ -16,7 +17,12 @@ func (inst *BpmHelp) _Impl() cli.Handler {
 }
 
 func (inst *BpmHelp) Init(service cli.Service) error {
-	service.RegisterHandler("bpm-help", inst)
+
+	//	service.RegisterHandler("bpm-help", inst)
+
+	h := &handlers.Help{}
+	service.RegisterHandler("bpm-help", h)
+
 	return nil
 }
 

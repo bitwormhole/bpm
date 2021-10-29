@@ -29,6 +29,20 @@ type pComBpmInstall struct {
 }
 
 
+type pComBpmMake struct {
+	instance *command0xf0f741.BpmMake
+	 markup0x23084a.Component `class:"cli-handler"`
+	Service service0xa5f732.MakeService `inject:"#bpm-make-service"`
+}
+
+
+type pComBpmPackInfo struct {
+	instance *command0xf0f741.BpmPackInfo
+	 markup0x23084a.Component `class:"cli-handler"`
+	Service service0xa5f732.PackInfoService `inject:"#bpm-pack-info-service"`
+}
+
+
 type pComBpmRun struct {
 	instance *command0xf0f741.BpmRun
 	 markup0x23084a.Component `class:"cli-handler"`

@@ -138,143 +138,245 @@ func SavePackageManifest(o *po.Manifest, props collection.Properties) error {
 // private
 
 func doAvailablePackagesItemLS(save bool, id string, o *entity.AvailablePackageInfo, props collection.Properties) error {
-	const (
-		pkey         = "id"
-		name         = "name"
-		sha256sum    = "sha256sum"
-		ctype        = "content-type"
-		url          = "url"
-		version      = "version"
-		dependencies = "dependencies"
-		revision     = "revision"
-		size         = "size"
-	)
-	kp := "package." + id + "." // key-prefix
-	if save {
-		setter := props.Setter()
-		setter.SetString(kp+pkey, id)
 
-		setter.SetString(kp+name, o.Name)
-		setter.SetString(kp+sha256sum, o.SHA256)
-		setter.SetString(kp+ctype, o.Type)
-		setter.SetString(kp+url, o.URL)
-		setter.SetString(kp+version, o.Version)
-		setter.SetString(kp+dependencies, o.Dependencies)
+	// const (
+	// 	pkey         = "id"
+	// 	name         = "name"
+	// 	sha256sum    = "sha256sum"
+	// 	ctype        = "content-type"
+	// 	url          = "url"
+	// 	version      = "version"
+	// 	dependencies = "dependencies"
+	// 	revision     = "revision"
+	// 	size         = "size"
+	// 	date         = "date"
+	// 	platform     = "platform"
+	// )
 
-		setter.SetInt(kp+revision, o.Revision)
-		setter.SetInt64(kp+size, o.Size)
-	} else {
-		getter := props.Getter()
-		o.ID = id
+	a := makeAdapterFor(save, props).Type("package").ID(id).Create()
+	o.ID = id
 
-		o.Name = getter.GetString(kp+name, "")
-		o.SHA256 = getter.GetString(kp+sha256sum, "")
-		o.Type = getter.GetString(kp+ctype, "")
-		o.URL = getter.GetString(kp+url, "")
-		o.Version = getter.GetString(kp+version, "")
-		o.Dependencies = getter.GetString(kp+dependencies, "")
+	a.ForString(&o.Dependencies, "dependencies")
+	a.ForString(&o.ID, "id")
+	a.ForString(&o.Name, "name")
+	a.ForString(&o.Platform, "platform")
+	a.ForString(&o.SHA256, "sha256sum")
+	a.ForString(&o.Type, "content-type")
+	a.ForString(&o.URL, "url")
+	a.ForString(&o.Version, "version")
 
-		o.Revision = getter.GetInt(kp+revision, 0)
-		o.Size = getter.GetInt64(kp+size, 0)
-	}
+	a.ForInt64(&o.Date, "date")
+	a.ForInt64(&o.Size, "size")
+	a.ForInt(&o.Revision, "revision")
+
+	o.ID = id
+
+	// kp := "package." + id + "." // key-prefix
+	// if save {
+	// 	setter := props.Setter()
+	// 	setter.SetString(kp+pkey, id)
+
+	// 	setter.SetString(kp+name, o.Name)
+	// 	setter.SetString(kp+sha256sum, o.SHA256)
+	// 	setter.SetString(kp+ctype, o.Type)
+	// 	setter.SetString(kp+url, o.URL)
+	// 	setter.SetString(kp+version, o.Version)
+	// 	setter.SetString(kp+dependencies, o.Dependencies)
+	// 	setter.SetString(kp+platform, o.Platform)
+
+	// 	setter.SetInt(kp+revision, o.Revision)
+	// 	setter.SetInt64(kp+size, o.Size)
+	// 	setter.SetInt64(kp+date, o.Date)
+
+	// } else {
+	// 	getter := props.Getter()
+	// 	o.ID = id
+
+	// 	o.Name = getter.GetString(kp+name, "")
+	// 	o.SHA256 = getter.GetString(kp+sha256sum, "")
+	// 	o.Type = getter.GetString(kp+ctype, "")
+	// 	o.URL = getter.GetString(kp+url, "")
+	// 	o.Version = getter.GetString(kp+version, "")
+	// 	o.Dependencies = getter.GetString(kp+dependencies, "")
+
+	// 	o.Revision = getter.GetInt(kp+revision, 0)
+	// 	o.Size = getter.GetInt64(kp+size, 0)
+	// }
 	return nil
 }
 
 func doInstalledPackagesItemLS(save bool, id string, o *entity.InstalledPackageInfo, props collection.Properties) error {
-	const (
-		pkey         = "id"
-		file         = "file"
-		name         = "name"
-		sha256sum    = "sha256sum"
-		ctype        = "content-type"
-		url          = "url"
-		version      = "version"
-		revision     = "revision"
-		dependencies = "dependencies"
-		autoupgrade  = "auto-upgrade"
-		size         = "size"
-	)
-	kp := "installed." + id + "." // key-prefix
-	if save {
-		setter := props.Setter()
-		setter.SetString(kp+pkey, id)
+	// const (
+	// 	pkey         = "id"
+	// 	file         = "file"
+	// 	name         = "name"
+	// 	sha256sum    = "sha256sum"
+	// 	ctype        = "content-type"
+	// 	url          = "url"
+	// 	version      = "version"
+	// 	revision     = "revision"
+	// 	dependencies = "dependencies"
+	// 	autoupgrade  = "auto-upgrade"
+	// 	size         = "size"
+	// )
 
-		setter.SetString(kp+file, o.File)
-		setter.SetString(kp+name, o.Name)
-		setter.SetString(kp+sha256sum, o.SHA256)
-		setter.SetString(kp+ctype, o.Type)
-		setter.SetString(kp+url, o.URL)
-		setter.SetString(kp+version, o.Version)
-		setter.SetString(kp+dependencies, o.Dependencies)
+	a := makeAdapterFor(save, props).Type("installed").ID(id).Create()
+	o.ID = id
 
-		setter.SetInt(kp+revision, o.Revision)
-		setter.SetBool(kp+autoupgrade, o.AutoUpgrade)
-		setter.SetInt64(kp+size, o.Size)
-	} else {
-		getter := props.Getter()
-		o.ID = id
+	a.ForString(&o.ID, "id")
+	a.ForString(&o.File, "file")
+	a.ForString(&o.Name, "name")
+	a.ForString(&o.SHA256, "sha256sum")
+	a.ForString(&o.Type, "content-type")
+	a.ForString(&o.URL, "url")
+	a.ForString(&o.Version, "version")
+	a.ForString(&o.Dependencies, "dependencies")
+	a.ForString(&o.Platform, "platform")
+	a.ForString(&o.MainPath, "main")
 
-		o.File = getter.GetString(kp+file, "")
-		o.Name = getter.GetString(kp+name, "")
-		o.SHA256 = getter.GetString(kp+sha256sum, "")
-		o.Type = getter.GetString(kp+ctype, "")
-		o.URL = getter.GetString(kp+url, "")
-		o.Version = getter.GetString(kp+version, "")
-		o.Dependencies = getter.GetString(kp+dependencies, "")
+	a.ForInt(&o.Revision, "revision")
+	a.ForBool(&o.AutoUpgrade, "auto-upgrade")
+	a.ForInt64(&o.Size, "size")
 
-		o.Size = getter.GetInt64(kp+size, 0)
-		o.Revision = getter.GetInt(kp+revision, 0)
-		o.AutoUpgrade = getter.GetBool(kp+autoupgrade, false)
-	}
+	o.ID = id
+
+	// kp := "installed." + id + "." // key-prefix
+	// if save {
+	// 	setter := props.Setter()
+	// 	setter.SetString(kp+pkey, id)
+
+	// 	setter.SetString(kp+file, o.File)
+	// 	setter.SetString(kp+name, o.Name)
+	// 	setter.SetString(kp+sha256sum, o.SHA256)
+	// 	setter.SetString(kp+ctype, o.Type)
+	// 	setter.SetString(kp+url, o.URL)
+	// 	setter.SetString(kp+version, o.Version)
+	// 	setter.SetString(kp+dependencies, o.Dependencies)
+
+	// 	setter.SetInt(kp+revision, o.Revision)
+	// 	setter.SetBool(kp+autoupgrade, o.AutoUpgrade)
+	// 	setter.SetInt64(kp+size, o.Size)
+	// } else {
+	// 	getter := props.Getter()
+	// 	o.ID = id
+
+	// 	o.File = getter.GetString(kp+file, "")
+	// 	o.Name = getter.GetString(kp+name, "")
+	// 	o.SHA256 = getter.GetString(kp+sha256sum, "")
+	// 	o.Type = getter.GetString(kp+ctype, "")
+	// 	o.URL = getter.GetString(kp+url, "")
+	// 	o.Version = getter.GetString(kp+version, "")
+	// 	o.Dependencies = getter.GetString(kp+dependencies, "")
+
+	// 	o.Size = getter.GetInt64(kp+size, 0)
+	// 	o.Revision = getter.GetInt(kp+revision, 0)
+	// 	o.AutoUpgrade = getter.GetBool(kp+autoupgrade, false)
+	// }
 	return nil
 }
 
 func doSourceListItemLS(save bool, id string, o *entity.PackSource, props collection.Properties) error {
-	const (
-		pkey = "id"
-		url  = "url"
-	)
-	kp := "source." + id + "." // key-prefix
-	if save {
-		setter := props.Setter()
-		setter.SetString(kp+pkey, id)
-		setter.SetString(kp+url, o.URL)
-	} else {
-		getter := props.Getter()
-		o.ID = id
-		o.URL = getter.GetString(kp+url, "")
-	}
+
+	// const (
+	// 	pkey = "id"
+	// 	url  = "url"
+	// )
+	// kp := "source." + id + "." // key-prefix
+	// if save {
+	// 	setter := props.Setter()
+	// 	setter.SetString(kp+pkey, id)
+	// 	setter.SetString(kp+url, o.URL)
+	// } else {
+	// 	getter := props.Getter()
+	// 	o.ID = id
+	// 	o.URL = getter.GetString(kp+url, "")
+	// }
+
+	a := makeAdapterFor(save, props).Type("source").ID(id).Create()
+	o.ID = id
+
+	a.ForString(&o.ID, "id")
+	a.ForString(&o.URL, "url")
+
+	o.ID = id
+	return nil
+}
+
+func doManifestMetaLS(save bool, o *entity.ManifestMeta, props collection.Properties) error {
+
+	const id = ""
+	a := makeAdapterFor(save, props).Type("package").ID(id).Create()
+	o.ID = id
+
+	a.ForString(&o.ID, "id")
+	a.ForString(&o.Name, "name")
+	a.ForString(&o.Type, "content-type")
+	a.ForString(&o.URL, "url")
+	a.ForString(&o.SHA256, "sha256sum")
+	a.ForString(&o.Version, "version")
+	a.ForString(&o.Dependencies, "dependencies")
+	a.ForString(&o.Platform, "platform")
+	a.ForString(&o.MainPath, "main")
+
+	a.ForInt(&o.Revision, "revision")
+	a.ForInt64(&o.Size, "size")
+	a.ForInt64(&o.Date, "date")
+
+	o.ID = id
 	return nil
 }
 
 func doManifestItemLS(save bool, id string, o *entity.ManifestItem, props collection.Properties) error {
-	const (
-		pkey      = "id"
-		name      = "name"
-		path      = "path"
-		sha256sum = "sha256sum"
-		size      = "size"
-		isdir     = "isdir"
-	)
-	kp := "file." + id + "." // key-prefix
-	if save {
-		setter := props.Setter()
-		setter.SetString(kp+pkey, id)
-		setter.SetString(kp+name, o.Name)
-		setter.SetString(kp+path, o.Path)
-		setter.SetString(kp+sha256sum, o.SHA256)
-		setter.SetInt64(kp+size, o.Size)
-		setter.SetBool(kp+isdir, o.IsDir)
-	} else {
-		getter := props.Getter()
-		o.ID = id
-		o.Name = getter.GetString(kp+name, "")
-		o.Path = getter.GetString(kp+path, "")
-		o.SHA256 = getter.GetString(kp+sha256sum, "")
-		o.Size = getter.GetInt64(kp+size, 0)
-		o.IsDir = getter.GetBool(kp+isdir, false)
-	}
+	// const (
+	// 	pkey      = "id"
+	// 	name      = "name"
+	// 	path      = "path"
+	// 	sha256sum = "sha256sum"
+	// 	size      = "size"
+	// 	isdir     = "isdir"
+	// )
+
+	a := makeAdapterFor(save, props).Type("file").ID(id).Create()
+	o.ID = id
+
+	a.ForString(&o.ID, "id")
+	a.ForString(&o.Name, "name")
+	a.ForString(&o.Path, "path")
+	a.ForString(&o.SHA256, "sha256sum")
+	a.ForInt64(&o.Size, "size")
+	a.ForBool(&o.IsDir, "isdir")
+
+	o.ID = id
+
+	// kp := "file." + id + "." // key-prefix
+	// if save {
+	// 	setter := props.Setter()
+	// 	setter.SetString(kp+pkey, id)
+	// 	setter.SetString(kp+name, o.Name)
+	// 	setter.SetString(kp+path, o.Path)
+	// 	setter.SetString(kp+sha256sum, o.SHA256)
+	// 	setter.SetInt64(kp+size, o.Size)
+	// 	setter.SetBool(kp+isdir, o.IsDir)
+	// } else {
+	// 	getter := props.Getter()
+	// 	o.ID = id
+	// 	o.Name = getter.GetString(kp+name, "")
+	// 	o.Path = getter.GetString(kp+path, "")
+	// 	o.SHA256 = getter.GetString(kp+sha256sum, "")
+	// 	o.Size = getter.GetInt64(kp+size, 0)
+	// 	o.IsDir = getter.GetBool(kp+isdir, false)
+	// }
 	return nil
+}
+
+func makeAdapterFor(save bool, props collection.Properties) AdapterBuilder {
+	ab := NewAdapterBuilder()
+	if save {
+		ab = ab.SetterFor(props)
+	} else {
+		ab = ab.GetterFor(props)
+	}
+	return ab
 }
 
 func listIds(props collection.Properties, prefix string, suffix string) []string {

@@ -20,6 +20,7 @@
             "program": "${workspaceFolder}/src/main/golang",
             "args": [
                 "help",
+                "--bpm-make"
             ]
         },
         {
@@ -40,6 +41,28 @@
             "program": "${workspaceFolder}/src/main/golang",
             "args": [
                 "install",
+                "example5"
+            ]
+        },
+        {
+            "name": "bpm-upgrade",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/src/main/golang",
+            "args": [
+                "upgrade",
+                "example5"
+            ]
+        },
+        {
+            "name": "bpm-xxx",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/src/main/golang",
+            "args": [
+                "pack-info",
                 "-a",
                 "-b",
                 "--foo",
