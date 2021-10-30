@@ -24,9 +24,21 @@ func (inst *BpmRun) Init(service cli.Service) error {
 
 func (inst *BpmRun) Handle(ctx *cli.TaskContext) error {
 
+	// bpm-run [package] [script]
+
+	args := ctx.CurrentTask.Arguments
+
 	in := vo.Run{}
 	out := vo.Run{}
-	in.PackageName = ""
-	in.Arguments = nil
+	in.PackageName = inst.getArgAt(1, args)
+	in.ScriptName = inst.getArgAt(2, args)
+	in.Arguments = args
 	return inst.Service.Run(ctx.Context, &in, &out)
+}
+
+func (inst *BpmRun) getArgAt(index int, args []string) string {
+	if index < len(args) {
+		return args[index]
+	}
+	return ""
 }

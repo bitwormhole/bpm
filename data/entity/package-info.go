@@ -6,11 +6,13 @@ type BasePackageInfo struct {
 
 	Name         string // the package name
 	URL          string
+	Filename     string
 	Type         string // mime-type
 	SHA256       string
 	Version      string
 	Dependencies string // 依赖的其它包名，以逗号“,”隔开
 	Platform     string
+	Main         string // path to main
 	Revision     int
 	Size         int64
 	Date         int64
@@ -26,6 +28,5 @@ type AvailablePackageInfo struct {
 type InstalledPackageInfo struct {
 	BasePackageInfo
 	AutoUpgrade bool
-	MainPath    string
 	File        string // local-path
 }

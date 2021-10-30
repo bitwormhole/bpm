@@ -124,6 +124,7 @@ func (inst *myMakeServiceTask) run() error {
 		return err
 	}
 
+	inst.logDone()
 	return nil
 }
 
@@ -182,19 +183,22 @@ func (inst *myMakeServiceTask) initFiles(dotBpm fs.Path) error {
 
 func (inst *myMakeServiceTask) makeOutputZipFileName() string {
 
-	meta := &inst.config.Meta
-	name := meta.Name
-	version := meta.Version
-	platform := meta.Platform
+	// meta := &inst.config.Meta
+	// name := meta.Name
+	// version := meta.Version
+	// platform := meta.Platform
 
-	builder := strings.Builder{}
-	builder.WriteString(name)
-	builder.WriteString("-")
-	builder.WriteString(version)
-	builder.WriteString("-")
-	builder.WriteString(platform)
-	builder.WriteString(".bpm.zip")
-	return builder.String()
+	// builder := strings.Builder{}
+	// builder.WriteString(name)
+	// builder.WriteString("-")
+	// builder.WriteString(version)
+	// builder.WriteString("-")
+	// builder.WriteString(platform)
+	// builder.WriteString(".bpm.zip")
+
+	return inst.config.Meta.Filename
+
+	// return builder.String()
 }
 
 func (inst *myMakeServiceTask) logPath(tag string, path fs.Path) {
@@ -322,10 +326,17 @@ func (inst *myMakeServiceTask) loadConfig() error {
 	if err != nil {
 		return err
 	}
+
 	props, err := collection.ParseProperties(text, nil)
 	if err != nil {
 		return err
 	}
+
+	err = tools.ResolveConfig(props)
+	if err != nil {
+		return err
+	}
+
 	return convert.LoadPackageManifest(&inst.config, props)
 }
 
@@ -402,7 +413,8 @@ func (inst *myMakeServiceTask) makeZipMeta() error {
 	packInfoItem.BasePackageInfo = inst.manifest.Meta.BasePackageInfo
 	packInfoItem.SHA256 = sum
 	packInfoItem.Size = zipfile.Size()
-	packInfoItem.URL = "https://todo/..."
+	packInfoItem.URL = inst.config.Meta.URL
+	packInfoItem.Filename = inst.config.Meta.Filename
 
 	// save
 	props := collection.CreateProperties()
@@ -413,6 +425,13 @@ func (inst *myMakeServiceTask) makeZipMeta() error {
 	text := collection.FormatPropertiesWithSegment(props)
 	file := inst.thePackInfoFile
 	return file.GetIO().WriteText(text, nil, true)
+}
+
+func (inst *myMakeServiceTask) logDone() error {
+	file := inst.theZipFile
+	msg := "The BPM file is created, path=" + file.Path()
+	inst.console.WriteString(msg + "\n")
+	return nil
 }
 
 ////////////////////////////////////////////////////////////////////////////////

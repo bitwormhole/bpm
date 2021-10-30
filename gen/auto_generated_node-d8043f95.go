@@ -52,6 +52,8 @@ type pComPackInfoServiceImpl struct {
 type pComRunServiceImpl struct {
 	instance *service0xa5f732.RunServiceImpl
 	 markup0x23084a.Component `id:"bpm-run-service" class:"bpm-service"`
+	PM service0xa5f732.PackageManager `inject:"#bpm-package-manager"`
+	Env service0xa5f732.EnvService `inject:"#bpm-env-service"`
 }
 
 

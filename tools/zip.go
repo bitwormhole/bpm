@@ -86,12 +86,22 @@ func (inst *zipDirWalker) walkInto(dir fs.Path, spath string, ttl int) error {
 }
 
 func (inst *zipDirWalker) onFile(file fs.Path, spath string) error {
+
 	in, err := file.GetIO().OpenReader(nil)
 	if err != nil {
 		return err
 	}
 	defer in.Close()
-	out, err := inst.zipwtr.Create(spath)
+
+	meta := file.GetMeta()
+	lastMod := meta.LastModTime()
+	header := &zip.FileHeader{
+		Name:   spath,
+		Method: zip.Deflate,
+	}
+	header.SetModTime(util.Int64ToTime(lastMod))
+	header.SetMode(meta.Mode())
+	out, err := inst.zipwtr.CreateHeader(header)
 	if err != nil {
 		return err
 	}

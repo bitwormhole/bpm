@@ -1422,12 +1422,16 @@ type comFactory4pComRunServiceImpl struct {
     mPrototype * service0xa5f732.RunServiceImpl
 
 	
+	mPMSelector config.InjectionSelector
+	mEnvSelector config.InjectionSelector
 
 }
 
 func (inst * comFactory4pComRunServiceImpl) init() application.ComponentFactory {
 
 	
+	inst.mPMSelector = config.NewInjectionSelector("#bpm-package-manager",nil)
+	inst.mEnvSelector = config.NewInjectionSelector("#bpm-env-service",nil)
 
 
 	inst.mPrototype = inst.newObject()
@@ -1463,7 +1467,47 @@ func (inst * comFactory4pComRunServiceImpl) Destroy(instance application.Compone
 }
 
 func (inst * comFactory4pComRunServiceImpl) Inject(instance application.ComponentInstance, context application.InstanceContext) error {
-	return nil
+	
+	obj := inst.castObject(instance)
+	obj.PM = inst.getterForFieldPMSelector(context)
+	obj.Env = inst.getterForFieldEnvSelector(context)
+	return context.LastError()
+}
+
+//getterForFieldPMSelector
+func (inst * comFactory4pComRunServiceImpl) getterForFieldPMSelector (context application.InstanceContext) service0xa5f732.PackageManager {
+
+	o1 := inst.mPMSelector.GetOne(context)
+	o2, ok := o1.(service0xa5f732.PackageManager)
+	if !ok {
+		eb := &util.ErrorBuilder{}
+		eb.Message("bad cast")
+		eb.Set("com", "bpm-run-service")
+		eb.Set("field", "PM")
+		eb.Set("type1", "?")
+		eb.Set("type2", "service0xa5f732.PackageManager")
+		context.HandleError(eb.Create())
+		return nil
+	}
+	return o2
+}
+
+//getterForFieldEnvSelector
+func (inst * comFactory4pComRunServiceImpl) getterForFieldEnvSelector (context application.InstanceContext) service0xa5f732.EnvService {
+
+	o1 := inst.mEnvSelector.GetOne(context)
+	o2, ok := o1.(service0xa5f732.EnvService)
+	if !ok {
+		eb := &util.ErrorBuilder{}
+		eb.Message("bad cast")
+		eb.Set("com", "bpm-run-service")
+		eb.Set("field", "Env")
+		eb.Set("type1", "?")
+		eb.Set("type2", "service0xa5f732.EnvService")
+		context.HandleError(eb.Create())
+		return nil
+	}
+	return o2
 }
 
 

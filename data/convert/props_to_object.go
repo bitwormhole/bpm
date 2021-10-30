@@ -245,8 +245,9 @@ func doInstalledPackagesItemLS(save bool, id string, o *entity.InstalledPackageI
 	a.ForString(&o.Version, "version")
 	a.ForString(&o.Dependencies, "dependencies")
 	a.ForString(&o.Platform, "platform")
-	a.ForString(&o.MainPath, "main")
+	a.ForString(&o.Main, "main")
 	a.ForString(&o.DateString, "date-text")
+	a.ForString(&o.Filename, "filename")
 
 	a.ForInt(&o.Revision, "revision")
 	a.ForBool(&o.AutoUpgrade, "auto-upgrade")
@@ -331,6 +332,7 @@ func doSignatureInfoLS(save bool, o *entity.SignatureInfo, props collection.Prop
 	a.ForString(&o.Dependencies, "dependencies")
 	a.ForString(&o.Platform, "platform")
 	a.ForString(&o.DateString, "date-text")
+	a.ForString(&o.Filename, "filename")
 
 	a.ForString(&o.Algorithm, "algorithm")
 	a.ForString(&o.PublicFinger, "public-key-fingerprint")
@@ -355,8 +357,9 @@ func doManifestMetaLS(save bool, o *entity.ManifestMeta, props collection.Proper
 	a.ForString(&o.Version, "version")
 	a.ForString(&o.Dependencies, "dependencies")
 	a.ForString(&o.Platform, "platform")
-	a.ForString(&o.MainPath, "main")
+	a.ForString(&o.Main, "main")
 	a.ForString(&o.DateString, "date-text")
+	a.ForString(&o.Filename, "filename")
 
 	a.ForInt(&o.Revision, "revision")
 	a.ForInt64(&o.Size, "size")

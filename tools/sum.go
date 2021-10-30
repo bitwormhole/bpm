@@ -17,3 +17,9 @@ func ComputeSHA256sum(file fs.Path) (string, error) {
 	str := util.StringifyBytes(sum[:])
 	return str, nil
 }
+
+// ComputeSHA256sumForBytes ...
+func ComputeSHA256sumForBytes(b []byte) string {
+	sum := sha256.Sum256(b)
+	return util.StringifyBytes(sum[:])
+}

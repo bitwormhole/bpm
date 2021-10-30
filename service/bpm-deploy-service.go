@@ -102,6 +102,8 @@ type deployServiceTask struct {
 	tmpDotBpmDir     fs.Path
 	tmpSignatureFile fs.Path
 	tmpManifestFile  fs.Path
+
+	err error
 }
 
 func (inst *deployServiceTask) run() error {
@@ -111,11 +113,13 @@ func (inst *deployServiceTask) run() error {
 		return err
 	}
 
-	// 检查是否需要skip当前的部署
 	inst.loadPack80()
-	if !inst.filter.AcceptDeploy(inst.pack80, inst.pack81) {
-		name := inst.pack81.Name
-		inst.console.WriteString("skip deploy " + name + "\n")
+	inst.logTodo()
+
+	// 检查是否需要skip当前的部署
+	accepted := inst.filter.AcceptDeploy(inst.pack80, inst.pack81)
+	if !accepted {
+		inst.console.WriteString(" ... skip deploying.\n")
 		return nil
 	}
 
@@ -160,8 +164,8 @@ func (inst *deployServiceTask) run() error {
 		return err
 	}
 
-	// 	inst.clearTempDir() @defer
-	return nil
+	// @defer	inst.clearTempDir()
+	return inst.done()
 }
 
 func (inst *deployServiceTask) init() error {
@@ -169,6 +173,22 @@ func (inst *deployServiceTask) init() error {
 		inst.filter = inst
 	}
 	return nil
+}
+
+func (inst *deployServiceTask) done() error {
+	if inst.err == nil {
+		msg := " ... deploying is success."
+		inst.console.WriteString(msg + "\n")
+	}
+	return inst.err
+}
+
+func (inst *deployServiceTask) logTodo() {
+	pkg := inst.pack81
+	name := pkg.Name
+	version := pkg.Version
+	msg := "deploy package: " + name + "@" + version
+	inst.console.WriteString(msg + " ...\n")
 }
 
 func (inst *deployServiceTask) AcceptDeploy(installed *entity.InstalledPackageInfo, available *entity.AvailablePackageInfo) bool {
@@ -299,28 +319,31 @@ func (inst *deployServiceTask) checkFilesInPackage() error {
 
 		// for dir
 		if item.IsDir {
-			if node.IsDir() {
-				continue
-			} else {
-				return errors.New("dir not found, path=" + item.Path)
+			// if node.IsDir() {
+			// 	continue
+			// } else {
+			// 	return errors.New("dir not found, path=" + item.Path)
+			// }
+			if !node.Exists() {
+				node.Mkdirs()
 			}
-		}
+		} else {
+			// for file
+			wantSum := item.SHA256
+			wantSize := item.Size
 
-		// for file
-		wantSum := item.SHA256
-		wantSize := item.Size
+			haveSum, err := tools.ComputeSHA256sum(node)
+			if err != nil {
+				return err
+			}
 
-		haveSum, err := tools.ComputeSHA256sum(node)
-		if err != nil {
-			return err
-		}
+			if wantSize != node.Size() {
+				return errors.New("bad file size, path=" + item.Path)
+			}
 
-		if wantSize != node.Size() {
-			return errors.New("bad file size, path=" + item.Path)
-		}
-
-		if wantSum != haveSum {
-			return errors.New("bad file sha256sum, path=" + item.Path)
+			if wantSum != haveSum {
+				return errors.New("bad file sha256sum, path=" + item.Path)
+			}
 		}
 	}
 	return nil
@@ -392,7 +415,7 @@ func (inst *deployServiceTask) saveMetaToInstalled() error {
 	if pack0 != nil {
 		pack2.AutoUpgrade = pack0.AutoUpgrade
 	}
-	pack2.MainPath = manifest.Meta.MainPath
+	pack2.Main = manifest.Meta.Main
 
 	// append newer
 	nextlist = append(nextlist, pack2)
