@@ -33,6 +33,25 @@ func LoadPackageSignature(o *po.Signature, props collection.Properties) error {
 	return doSignatureInfoLS(save, &o.Info, props)
 }
 
+// LoadMainConfig ...
+func LoadMainConfig(o *po.AppMain, props collection.Properties) error {
+	const save = false
+	list := make([]*entity.MainScript, 0)
+	ids := listIds(props, "script.", ".name")
+
+	for _, id := range ids {
+		item := &entity.MainScript{}
+		err := doMainConfigScriptLS(save, id, item, props)
+		if err != nil {
+			return err
+		}
+		list = append(list, item)
+	}
+
+	o.Scripts = list
+	return doMainConfigHeadLS(save, &o.Main, props)
+}
+
 // LoadPackageSourceList ...
 func LoadPackageSourceList(o *po.PackageSourceList, props collection.Properties) error {
 	const save = false
@@ -151,20 +170,6 @@ func SavePackageSignature(o *po.Signature, props collection.Properties) error {
 
 func doAvailablePackagesItemLS(save bool, id string, o *entity.AvailablePackageInfo, props collection.Properties) error {
 
-	// const (
-	// 	pkey         = "id"
-	// 	name         = "name"
-	// 	sha256sum    = "sha256sum"
-	// 	ctype        = "content-type"
-	// 	url          = "url"
-	// 	version      = "version"
-	// 	dependencies = "dependencies"
-	// 	revision     = "revision"
-	// 	size         = "size"
-	// 	date         = "date"
-	// 	platform     = "platform"
-	// )
-
 	a := makeAdapterFor(save, props).Type("package").ID(id).Create()
 	o.ID = id
 
@@ -184,54 +189,10 @@ func doAvailablePackagesItemLS(save bool, id string, o *entity.AvailablePackageI
 
 	o.ID = id
 
-	// kp := "package." + id + "." // key-prefix
-	// if save {
-	// 	setter := props.Setter()
-	// 	setter.SetString(kp+pkey, id)
-
-	// 	setter.SetString(kp+name, o.Name)
-	// 	setter.SetString(kp+sha256sum, o.SHA256)
-	// 	setter.SetString(kp+ctype, o.Type)
-	// 	setter.SetString(kp+url, o.URL)
-	// 	setter.SetString(kp+version, o.Version)
-	// 	setter.SetString(kp+dependencies, o.Dependencies)
-	// 	setter.SetString(kp+platform, o.Platform)
-
-	// 	setter.SetInt(kp+revision, o.Revision)
-	// 	setter.SetInt64(kp+size, o.Size)
-	// 	setter.SetInt64(kp+date, o.Date)
-
-	// } else {
-	// 	getter := props.Getter()
-	// 	o.ID = id
-
-	// 	o.Name = getter.GetString(kp+name, "")
-	// 	o.SHA256 = getter.GetString(kp+sha256sum, "")
-	// 	o.Type = getter.GetString(kp+ctype, "")
-	// 	o.URL = getter.GetString(kp+url, "")
-	// 	o.Version = getter.GetString(kp+version, "")
-	// 	o.Dependencies = getter.GetString(kp+dependencies, "")
-
-	// 	o.Revision = getter.GetInt(kp+revision, 0)
-	// 	o.Size = getter.GetInt64(kp+size, 0)
-	// }
 	return nil
 }
 
 func doInstalledPackagesItemLS(save bool, id string, o *entity.InstalledPackageInfo, props collection.Properties) error {
-	// const (
-	// 	pkey         = "id"
-	// 	file         = "file"
-	// 	name         = "name"
-	// 	sha256sum    = "sha256sum"
-	// 	ctype        = "content-type"
-	// 	url          = "url"
-	// 	version      = "version"
-	// 	revision     = "revision"
-	// 	dependencies = "dependencies"
-	// 	autoupgrade  = "auto-upgrade"
-	// 	size         = "size"
-	// )
 
 	a := makeAdapterFor(save, props).Type("installed").ID(id).Create()
 	o.ID = id
@@ -254,58 +215,10 @@ func doInstalledPackagesItemLS(save bool, id string, o *entity.InstalledPackageI
 	a.ForInt64(&o.Size, "size")
 
 	o.ID = id
-
-	// kp := "installed." + id + "." // key-prefix
-	// if save {
-	// 	setter := props.Setter()
-	// 	setter.SetString(kp+pkey, id)
-
-	// 	setter.SetString(kp+file, o.File)
-	// 	setter.SetString(kp+name, o.Name)
-	// 	setter.SetString(kp+sha256sum, o.SHA256)
-	// 	setter.SetString(kp+ctype, o.Type)
-	// 	setter.SetString(kp+url, o.URL)
-	// 	setter.SetString(kp+version, o.Version)
-	// 	setter.SetString(kp+dependencies, o.Dependencies)
-
-	// 	setter.SetInt(kp+revision, o.Revision)
-	// 	setter.SetBool(kp+autoupgrade, o.AutoUpgrade)
-	// 	setter.SetInt64(kp+size, o.Size)
-	// } else {
-	// 	getter := props.Getter()
-	// 	o.ID = id
-
-	// 	o.File = getter.GetString(kp+file, "")
-	// 	o.Name = getter.GetString(kp+name, "")
-	// 	o.SHA256 = getter.GetString(kp+sha256sum, "")
-	// 	o.Type = getter.GetString(kp+ctype, "")
-	// 	o.URL = getter.GetString(kp+url, "")
-	// 	o.Version = getter.GetString(kp+version, "")
-	// 	o.Dependencies = getter.GetString(kp+dependencies, "")
-
-	// 	o.Size = getter.GetInt64(kp+size, 0)
-	// 	o.Revision = getter.GetInt(kp+revision, 0)
-	// 	o.AutoUpgrade = getter.GetBool(kp+autoupgrade, false)
-	// }
 	return nil
 }
 
 func doSourceListItemLS(save bool, id string, o *entity.PackSource, props collection.Properties) error {
-
-	// const (
-	// 	pkey = "id"
-	// 	url  = "url"
-	// )
-	// kp := "source." + id + "." // key-prefix
-	// if save {
-	// 	setter := props.Setter()
-	// 	setter.SetString(kp+pkey, id)
-	// 	setter.SetString(kp+url, o.URL)
-	// } else {
-	// 	getter := props.Getter()
-	// 	o.ID = id
-	// 	o.URL = getter.GetString(kp+url, "")
-	// }
 
 	a := makeAdapterFor(save, props).Type("source").ID(id).Create()
 	o.ID = id
@@ -375,14 +288,6 @@ func doManifestMetaLS(save bool, o *entity.ManifestMeta, props collection.Proper
 }
 
 func doManifestItemLS(save bool, id string, o *entity.ManifestItem, props collection.Properties) error {
-	// const (
-	// 	pkey      = "id"
-	// 	name      = "name"
-	// 	path      = "path"
-	// 	sha256sum = "sha256sum"
-	// 	size      = "size"
-	// 	isdir     = "isdir"
-	// )
 
 	a := makeAdapterFor(save, props).Type("file").ID(id).Create()
 	o.ID = id
@@ -395,25 +300,33 @@ func doManifestItemLS(save bool, id string, o *entity.ManifestItem, props collec
 	a.ForBool(&o.IsDir, "isdir")
 
 	o.ID = id
+	return nil
+}
 
-	// kp := "file." + id + "." // key-prefix
-	// if save {
-	// 	setter := props.Setter()
-	// 	setter.SetString(kp+pkey, id)
-	// 	setter.SetString(kp+name, o.Name)
-	// 	setter.SetString(kp+path, o.Path)
-	// 	setter.SetString(kp+sha256sum, o.SHA256)
-	// 	setter.SetInt64(kp+size, o.Size)
-	// 	setter.SetBool(kp+isdir, o.IsDir)
-	// } else {
-	// 	getter := props.Getter()
-	// 	o.ID = id
-	// 	o.Name = getter.GetString(kp+name, "")
-	// 	o.Path = getter.GetString(kp+path, "")
-	// 	o.SHA256 = getter.GetString(kp+sha256sum, "")
-	// 	o.Size = getter.GetInt64(kp+size, 0)
-	// 	o.IsDir = getter.GetBool(kp+isdir, false)
-	// }
+func doMainConfigHeadLS(save bool, o *entity.MainHead, props collection.Properties) error {
+
+	a := makeAdapterFor(save, props).Type("main").ID("").Create()
+
+	a.ForString(&o.Description, "description")
+	a.ForString(&o.Name, "name")
+	a.ForString(&o.Package, "package")
+	a.ForString(&o.Script, "script")
+	a.ForString(&o.Title, "title")
+
+	return nil
+}
+
+func doMainConfigScriptLS(save bool, id string, o *entity.MainScript, props collection.Properties) error {
+
+	a := makeAdapterFor(save, props).Type("script").ID(id).Create()
+	o.Name = id
+
+	a.ForString(&o.Arguments, "args")
+	a.ForString(&o.Executable, "executable")
+	a.ForString(&o.Name, "name")
+	a.ForString(&o.WorkingDirectory, "working-directory")
+
+	o.Name = id
 	return nil
 }
 

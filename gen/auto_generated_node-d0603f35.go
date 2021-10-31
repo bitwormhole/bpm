@@ -6,6 +6,7 @@ package gen
 import (
 	command0xf0f741 "github.com/bitwormhole/bpm/command"
 	service0xa5f732 "github.com/bitwormhole/bpm/service"
+	application0x67f6c5 "github.com/bitwormhole/starter/application"
 	markup0x23084a "github.com/bitwormhole/starter/markup"
 )
 
@@ -61,6 +62,13 @@ type pComBpmUpgrade struct {
 	instance *command0xf0f741.BpmUpgrade
 	 markup0x23084a.Component `class:"cli-handler"`
 	Service service0xa5f732.UpgradeService `inject:"#bpm-upgrade-service"`
+}
+
+
+type pComBpmVersion struct {
+	instance *command0xf0f741.BpmVersion
+	 markup0x23084a.Component `class:"cli-handler"`
+	Context application0x67f6c5.Context `inject:"context"`
 }
 
 

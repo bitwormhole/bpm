@@ -102,9 +102,18 @@ func autoGenConfig(cb application.ConfigBuilder) error {
 		return err
 	}
 
-	// component: com9-command0xf0f741.Bpm
+	// component: com9-command0xf0f741.BpmVersion
 	cominfobuilder.Next()
-	cominfobuilder.ID("com9-command0xf0f741.Bpm").Class("cli-handler").Aliases("").Scope("")
+	cominfobuilder.ID("com9-command0xf0f741.BpmVersion").Class("cli-handler").Aliases("").Scope("")
+	cominfobuilder.Factory((&comFactory4pComBpmVersion{}).init())
+	err = cominfobuilder.CreateTo(cb)
+	if err != nil {
+		return err
+	}
+
+	// component: com10-command0xf0f741.Bpm
+	cominfobuilder.Next()
+	cominfobuilder.ID("com10-command0xf0f741.Bpm").Class("cli-handler").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComBpm{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
@@ -895,7 +904,71 @@ func (inst * comFactory4pComBpmUpgrade) getterForFieldServiceSelector (context a
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComBpm : the factory of component: com9-command0xf0f741.Bpm
+// comFactory4pComBpmVersion : the factory of component: com9-command0xf0f741.BpmVersion
+type comFactory4pComBpmVersion struct {
+
+    mPrototype * command0xf0f741.BpmVersion
+
+	
+	mContextSelector config.InjectionSelector
+
+}
+
+func (inst * comFactory4pComBpmVersion) init() application.ComponentFactory {
+
+	
+	inst.mContextSelector = config.NewInjectionSelector("context",nil)
+
+
+	inst.mPrototype = inst.newObject()
+    return inst
+}
+
+func (inst * comFactory4pComBpmVersion) newObject() * command0xf0f741.BpmVersion {
+	return & command0xf0f741.BpmVersion {}
+}
+
+func (inst * comFactory4pComBpmVersion) castObject(instance application.ComponentInstance) * command0xf0f741.BpmVersion {
+	return instance.Get().(*command0xf0f741.BpmVersion)
+}
+
+func (inst * comFactory4pComBpmVersion) GetPrototype() lang.Object {
+	return inst.mPrototype
+}
+
+func (inst * comFactory4pComBpmVersion) NewInstance() application.ComponentInstance {
+	return config.SimpleInstance(inst, inst.newObject())
+}
+
+func (inst * comFactory4pComBpmVersion) AfterService() application.ComponentAfterService {
+	return inst
+}
+
+func (inst * comFactory4pComBpmVersion) Init(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComBpmVersion) Destroy(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComBpmVersion) Inject(instance application.ComponentInstance, context application.InstanceContext) error {
+	
+	obj := inst.castObject(instance)
+	obj.Context = inst.getterForFieldContextSelector(context)
+	return context.LastError()
+}
+
+//getterForFieldContextSelector
+func (inst * comFactory4pComBpmVersion) getterForFieldContextSelector (context application.InstanceContext) application.Context {
+    return context.Context()
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+// comFactory4pComBpm : the factory of component: com10-command0xf0f741.Bpm
 type comFactory4pComBpm struct {
 
     mPrototype * command0xf0f741.Bpm

@@ -3,6 +3,8 @@ package service
 import (
 	"context"
 	"errors"
+	"os/exec"
+	"strings"
 
 	"github.com/bitwormhole/bpm/data/convert"
 	"github.com/bitwormhole/bpm/data/entity"
@@ -13,6 +15,7 @@ import (
 	"github.com/bitwormhole/starter/collection"
 	"github.com/bitwormhole/starter/io/fs"
 	"github.com/bitwormhole/starter/markup"
+	"github.com/bitwormhole/starter/vlog"
 )
 
 type RunService interface {
@@ -53,6 +56,9 @@ type myRunServiceTask struct {
 	context context.Context
 	console cli.Console
 
+	scriptName  string
+	packageName string
+
 	theBitwormholeHome fs.Path
 
 	mainConfigFile    fs.Path
@@ -60,6 +66,7 @@ type myRunServiceTask struct {
 	mainConfigData    []byte
 	mainConfigSumWant string
 	mainConfigSumHave string
+	mainConfigModel   po.AppMain
 
 	manifestFile    fs.Path
 	manifestProps   collection.Properties
@@ -68,13 +75,13 @@ type myRunServiceTask struct {
 	manifestSumHave string
 	manifestModel   po.Manifest
 
-	exeFile    fs.Path
-	exeSumWant string
-	exeSumHave string
+	exeFile       fs.Path
+	exeWorkingDir fs.Path
+	exeSumWant    string
+	exeSumHave    string
 
-	scriptName  string
-	packageName string
-	packInfo    entity.InstalledPackageInfo
+	targetScript *entity.MainScript
+	packInfo     entity.InstalledPackageInfo
 }
 
 func (inst *myRunServiceTask) run() error {
@@ -99,12 +106,24 @@ func (inst *myRunServiceTask) run() error {
 		return err
 	}
 
+	err = inst.selectTargetScript()
+	if err != nil {
+		return err
+	}
+
 	err = inst.loadExecutableInfo()
 	if err != nil {
 		return err
 	}
 
-	return nil
+	err = inst.checkFiles()
+	if err != nil {
+		return err
+	}
+
+	inst.printScriptParams()
+
+	return inst.execute()
 }
 
 func (inst *myRunServiceTask) init() error {
@@ -113,10 +132,18 @@ func (inst *myRunServiceTask) init() error {
 	return nil
 }
 
-func (inst *myRunServiceTask) lookUpForExeFile() (fs.Path, error) {
+func (inst *myRunServiceTask) lookUpForWorkingDir() (fs.Path, error) {
+	selector := inst.targetScript
+	home := inst.theBitwormholeHome
+	dir := home.GetChild(selector.WorkingDirectory)
+	return dir, nil
+}
 
-	//todo
-	return nil, nil
+func (inst *myRunServiceTask) lookUpForExeFile() (fs.Path, error) {
+	selector := inst.targetScript
+	home := inst.theBitwormholeHome
+	file := home.GetChild(selector.Executable)
+	return file, nil
 }
 
 func (inst *myRunServiceTask) lookUpForManifestFile() (fs.Path, error) {
@@ -139,6 +166,11 @@ func (inst *myRunServiceTask) loadExecutableInfo() error {
 		return err
 	}
 
+	wd, err := inst.lookUpForWorkingDir()
+	if err != nil {
+		return err
+	}
+
 	sum, err := tools.ComputeSHA256sum(file)
 	if err != nil {
 		return err
@@ -146,6 +178,7 @@ func (inst *myRunServiceTask) loadExecutableInfo() error {
 
 	inst.exeSumHave = sum
 	inst.exeFile = file
+	inst.exeWorkingDir = wd
 	return nil
 }
 
@@ -181,6 +214,32 @@ func (inst *myRunServiceTask) loadManifest() error {
 	return nil
 }
 
+func (inst *myRunServiceTask) selectTargetScript() error {
+
+	selector := strings.TrimSpace(inst.scriptName)
+	model := &inst.mainConfigModel
+	scripts := model.Scripts
+	scriptPtr := inst.targetScript
+
+	if selector == "" {
+		selector = model.Main.Script // use the default script
+	}
+
+	for _, script := range scripts {
+		if script.Name == selector {
+			scriptPtr = script
+			break
+		}
+	}
+
+	if scriptPtr == nil {
+		return errors.New("no script named: " + selector)
+	}
+
+	inst.targetScript = scriptPtr
+	return nil
+}
+
 func (inst *myRunServiceTask) loadMainConfig() error {
 
 	file, err := inst.lookUpForMainConfigFile()
@@ -201,7 +260,10 @@ func (inst *myRunServiceTask) loadMainConfig() error {
 
 	sum := tools.ComputeSHA256sumForBytes(data)
 
-	// todo : convert.load
+	err = convert.LoadMainConfig(&inst.mainConfigModel, props)
+	if err != nil {
+		return err
+	}
 
 	inst.mainConfigData = data
 	inst.mainConfigProps = props
@@ -226,6 +288,68 @@ func (inst *myRunServiceTask) loadPackInfo() error {
 	}
 
 	return errors.New("no installed package named: " + pkgName)
+}
+
+func (inst *myRunServiceTask) checkFiles() error {
+
+	manifest := string(inst.manifestData)
+	executableSum := inst.exeSumHave
+	mainConfigSum := inst.mainConfigSumHave
+	manifestSum := inst.manifestSumHave
+
+	if !strings.Contains(manifest, executableSum) {
+		return errors.New("executable file is not in manifest")
+	}
+	if !strings.Contains(manifest, mainConfigSum) {
+		return errors.New("main-config file is not in manifest")
+	}
+
+	vlog.Info("check ", manifestSum, ": manifest ... ok")
+	vlog.Info("check ", mainConfigSum, ": init ... ok")
+	vlog.Info("check ", executableSum, ": "+inst.exeFile.Name()+" ... ok")
+
+	// todo ... check signature
+
+	return nil
+}
+
+func (inst *myRunServiceTask) printScriptParams() {
+
+	wd := inst.exeWorkingDir
+	exe := inst.exeFile
+	args := inst.targetScript.Arguments
+	console := inst.console
+
+	console.WriteString("\nscript.arguments=" + args)
+	console.WriteString("\nscript.working-directory=" + wd.Path())
+	console.WriteString("\nscript.executable=" + exe.Path())
+	console.WriteString("\n\n")
+}
+
+func (inst *myRunServiceTask) execute() error {
+
+	console := inst.console
+	wd := inst.exeWorkingDir
+	exefile := inst.exeFile
+
+	parser := cli.CommandLineParser{}
+	args, err := parser.Parse(inst.targetScript.Arguments)
+	if err != nil {
+		return err
+	}
+
+	cmd := exec.Command(exefile.Path())
+	cmd.Dir = wd.Path()
+	cmd.Args = args
+	cmd.Stdout = console.Output()
+	cmd.Stderr = console.Error()
+
+	err = cmd.Start()
+	if err != nil {
+		return err
+	}
+
+	return cmd.Wait()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
