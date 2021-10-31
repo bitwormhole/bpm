@@ -1,0 +1,12 @@
+[package "4ca548ec90"]
+  content-type=application/x-bpm-package
+  date=1635608125041
+  date-text=2021-10-30 23:35:25.041 +0800 CST
+  id=4ca548ec90
+  name=demo5
+  platform=windows-amd64
+  revision=11
+  sha256sum=ad2fe6dca5aabd50174e915899ac9fe07f9d22f01259fdfe0e93bee9181f2c0f
+  size=12868
+  url=https://release.bitwormhole.com/packages/demo5/v0.1.0/demo5-v0.1.0-windows-amd64.bpm
+  version=v0.1.0

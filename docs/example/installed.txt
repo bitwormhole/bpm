@@ -1,0 +1,24 @@
+[installed "0c1842856b"]
+  auto-upgrade=true
+  content-type=application/x-bpm-package
+  file=F:\dev\test\bitwormhole_home\var\cache\bpm\packages\example5\v0.0.5\68e3774ce588eb7c471603231f4ecba132f445a7ff959759d9d6627556e40b42\example5-v0.0.5.bpm
+  id=0c1842856b
+  name=example5
+  revision=5
+  sha256sum=68e3774ce588eb7c471603231f4ecba132f445a7ff959759d9d6627556e40b42
+  size=4725
+  url=https://release.bitwormhole.com/packages/bpm/example5-r5.bpm.zip
+  version=v0.0.5
+  
+[installed "c5ef56821a"]
+  auto-upgrade=false
+  content-type=application/x-bpm-package
+  file=F:\dev\test\bitwormhole_home\var\cache\bpm\packages\demo5\v0.1.0\ad2fe6dca5aabd50174e915899ac9fe07f9d22f01259fdfe0e93bee9181f2c0f\demo5-v0.1.0.bpm
+  id=c5ef56821a
+  main=etc/demo5/main.init
+  name=demo5
+  revision=11
+  sha256sum=ad2fe6dca5aabd50174e915899ac9fe07f9d22f01259fdfe0e93bee9181f2c0f
+  size=12868
+  url=https://release.bitwormhole.com/packages/demo5/v0.1.0/demo5-v0.1.0-windows-amd64.bpm
+  version=v0.1.0

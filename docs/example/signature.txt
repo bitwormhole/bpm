@@ -1,0 +1,10 @@
+[signature]
+  content-type=application/x-bpm-package
+  date-text=2021-10-30 23:35:25.041 +0800 CST
+  filename=demo5-v0.1.0-windows-amd64.bpm
+  name=demo5
+  plain=sha256sum(manifest):939ed026d9640f8173e522c157a1862d9bf6ddbcbb6285a876b5544692980cd7
+  platform=windows-amd64
+  secret=todo:99999999999
+  url=https://release.bitwormhole.com/packages/demo5/v0.1.0/demo5-v0.1.0-windows-amd64.bpm
+  version=v0.1.0

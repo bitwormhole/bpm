@@ -1,0 +1,24 @@
+[main]
+    name=demo5
+    package=demo5
+    title=demo5
+    script=console
+    description=a demo for bpm (ver.5)
+
+[script "start"]
+    args=1
+    name=console
+    executable=usr/lib/demo5/GieConsole.exe
+    working-directory=home/default
+    
+[script "stop"]
+    args=1
+    name=console
+    executable=usr/lib/demo5/GieConsole.exe
+    working-directory=home/default
+    
+[script "console"]
+    args=1
+    name=console
+    executable=usr/lib/demo5/GieConsole.exe
+    working-directory=home/default

@@ -1,0 +1,9 @@
+[package]
+    name=demo5
+    revision=11
+    version=v0.1.0
+    content-type=application/x-bpm-package
+    platform=windows-amd64
+    main=etc/demo5/main.init
+    filename=${package.name}-${package.version}-${package.platform}.bpm
+    url=https://release.bitwormhole.com/packages/${package.name}/${package.version}/${package.filename}

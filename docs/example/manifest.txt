@@ -1,0 +1,28 @@
+
+[file "ed6132d0a3"]
+  id=ed6132d0a3
+  isdir=false
+  name=bing.png
+  path=var/www/image/bing.png
+  sha256sum=6fcb83d04dc14e5081d52466e1af05f95d0a42e3573a8b2ce94404fa4f2b42ea
+  size=2400
+
+[file "f7f41306b1"]
+  id=f7f41306b1
+  isdir=true
+  name=css
+  path=var/www/css/
+  size=0
+
+[package]
+  content-type=application/x-bpm-package
+  date=1635608125041
+  date-text=2021-10-30 23:35:25.041 +0800 CST
+  filename=demo5-v0.1.0-windows-amd64.bpm
+  main=etc/demo5/main.init
+  name=demo5
+  platform=windows-amd64
+  revision=11
+  size=0
+  url=https://release.bitwormhole.com/packages/demo5/v0.1.0/demo5-v0.1.0-windows-amd64.bpm
+  version=v0.1.0
