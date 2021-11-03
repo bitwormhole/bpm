@@ -10,6 +10,13 @@ import (
 	markup0x23084a "github.com/bitwormhole/starter/markup"
 )
 
+type pComBpmAutoUpgrade struct {
+	instance *command0xf0f741.BpmAutoUpgrade
+	 markup0x23084a.Component `class:"cli-handler"`
+	Service service0xa5f732.UpgradeService `inject:"#bpm-upgrade-service"`
+}
+
+
 type pComBpmFetch struct {
 	instance *command0xf0f741.BpmFetch
 	 markup0x23084a.Component `class:"cli-handler"`

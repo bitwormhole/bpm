@@ -31,6 +31,15 @@ type EnvService interface {
 	// "etc/bpm/installed"
 	GetInstalledFile() fs.Path
 
+	// "etc/bpm/auto-upgrade"
+	GetAutoUpgradeFile() fs.Path
+
+	// "etc/bpm/manifest.d"
+	GetManifestDir() fs.Path
+
+	// "etc/bpm/signature.d"
+	GetSignatureDir() fs.Path
+
 	// "files"
 	GetFilesFolder() fs.Path
 
@@ -85,6 +94,21 @@ func (inst *EnvServiceImpl) GetInstalledFile() fs.Path {
 // GetFilesFolder ...
 func (inst *EnvServiceImpl) GetFilesFolder() fs.Path {
 	return inst.GetBitwormholeHome().GetChild("files")
+}
+
+// GetAutoUpgradeFile "etc/bpm/auto-upgrade"
+func (inst *EnvServiceImpl) GetAutoUpgradeFile() fs.Path {
+	return inst.GetBitwormholeHome().GetChild("etc/bpm/auto-upgrade")
+}
+
+// GetManifestDir "etc/bpm/manifest.d"
+func (inst *EnvServiceImpl) GetManifestDir() fs.Path {
+	return inst.GetBitwormholeHome().GetChild("etc/bpm/manifest.d")
+}
+
+// GetSignatureDir "etc/bpm/signature.d"
+func (inst *EnvServiceImpl) GetSignatureDir() fs.Path {
+	return inst.GetBitwormholeHome().GetChild("etc/bpm/signature.d")
 }
 
 // GetLocalBpmFiles ...

@@ -154,7 +154,7 @@ func (inst *deployServiceTask) run() error {
 		return err
 	}
 
-	err = inst.moveManifestAndSignature()
+	err = inst.saveManifestAndSignature()
 	if err != nil {
 		return err
 	}
@@ -270,18 +270,52 @@ func (inst *deployServiceTask) loadPropertiesFile(file fs.Path) (string, collect
 
 }
 
-func (inst *deployServiceTask) moveManifestAndSignature() error {
+// todo...
+func (inst *deployServiceTask) saveManifestAndSignature() error {
 
-	src1 := inst.tmpManifestFile
-	dst1 := inst.bpmFiles.Manifest
-	err := src1.MoveTo(dst1)
+	// to read
+	manifest1 := inst.tmpManifestFile
+	manifestData, err := manifest1.GetIO().ReadBinary(nil)
 	if err != nil {
 		return err
 	}
 
-	src2 := inst.tmpSignatureFile
-	dst2 := inst.bpmFiles.Signature
-	return src2.MoveTo(dst2)
+	sign1 := inst.tmpSignatureFile
+	signData, err := sign1.GetIO().ReadBinary(nil)
+	if err != nil {
+		return err
+	}
+
+	// to compute
+	sum := tools.ComputeSHA256sumForBytes(manifestData)
+
+	// to write
+	manifest2 := inst.bpmFiles.Manifest
+	manifest3 := inst.parent.Env.GetManifestDir().GetChild(sum)
+	sign2 := inst.bpmFiles.Signature
+	sign3 := inst.parent.Env.GetSignatureDir().GetChild(sum)
+
+	err = manifest2.GetIO().WriteBinary(manifestData, nil, true)
+	if err != nil {
+		return err
+	}
+
+	err = manifest3.GetIO().WriteBinary(manifestData, nil, true)
+	if err != nil {
+		return err
+	}
+
+	err = sign2.GetIO().WriteBinary(signData, nil, true)
+	if err != nil {
+		return err
+	}
+
+	err = sign3.GetIO().WriteBinary(signData, nil, true)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (inst *deployServiceTask) loadManifestAndSignature() error {

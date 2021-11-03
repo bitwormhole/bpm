@@ -2,11 +2,13 @@ package convert
 
 import (
 	"crypto/sha256"
+	"strconv"
 	"strings"
 
 	"github.com/bitwormhole/bpm/data/entity"
 	"github.com/bitwormhole/bpm/data/po"
 	"github.com/bitwormhole/starter/collection"
+	"github.com/bitwormhole/starter/io/fs"
 	"github.com/bitwormhole/starter/util"
 )
 
@@ -53,20 +55,25 @@ func LoadMainConfig(o *po.AppMain, props collection.Properties) error {
 }
 
 // LoadPackageSourceList ...
-func LoadPackageSourceList(o *po.PackageSourceList, props collection.Properties) error {
-	const save = false
-	list := make([]*entity.PackSource, 0)
-	ids := listIds(props, "source.", ".id")
-	for _, id := range ids {
-		item := &entity.PackSource{}
-		err := doSourceListItemLS(save, id, item, props)
-		if err != nil {
-			return err
-		}
-		list = append(list, item)
+func LoadPackageSourceList(file fs.Path) ([]*entity.PackSource, error) {
+	text, err := file.GetIO().ReadText(nil)
+	if err != nil {
+		return nil, err
 	}
-	o.Sources = list
-	return nil
+	text = strings.ReplaceAll(text, "\r", "\n")
+	list1 := strings.Split(text, "\n")
+	list2 := make([]*entity.PackSource, 0)
+	for i, row := range list1 {
+		url := strings.TrimSpace(row)
+		if len(url) < 6 {
+			continue
+		}
+		ps := &entity.PackSource{}
+		ps.URL = url
+		ps.ID = strconv.Itoa(i)
+		list2 = append(list2, ps)
+	}
+	return list2, nil
 }
 
 // LoadInstalledPackages ...
@@ -100,20 +107,6 @@ func LoadAvailablePackages(o *po.AvailablePackages, props collection.Properties)
 		list = append(list, item)
 	}
 	o.Packages = list
-	return nil
-}
-
-// SavePackageSourceList 保存软件源列表
-func SavePackageSourceList(o *po.PackageSourceList, props collection.Properties) error {
-	const save = true
-	all := o.Sources
-	for _, item := range all {
-		id := computeSHA256sumWithLength(10, item.URL)
-		err := doSourceListItemLS(save, id, item, props)
-		if err != nil {
-			return err
-		}
-	}
 	return nil
 }
 
@@ -213,18 +206,6 @@ func doInstalledPackagesItemLS(save bool, id string, o *entity.InstalledPackageI
 	a.ForInt(&o.Revision, "revision")
 	a.ForBool(&o.AutoUpgrade, "auto-upgrade")
 	a.ForInt64(&o.Size, "size")
-
-	o.ID = id
-	return nil
-}
-
-func doSourceListItemLS(save bool, id string, o *entity.PackSource, props collection.Properties) error {
-
-	a := makeAdapterFor(save, props).Type("source").ID(id).Create()
-	o.ID = id
-
-	a.ForString(&o.ID, "id")
-	a.ForString(&o.URL, "url")
 
 	o.ID = id
 	return nil

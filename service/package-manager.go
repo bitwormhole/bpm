@@ -14,13 +14,13 @@ import (
 
 // PackageManager 包管理器
 type PackageManager interface {
+	LoadAvailablePackages() (*po.AvailablePackages, error)
 	LoadInstalledPackages() (*po.InstalledPackages, error)
 	LoadPackageSourceList() (*po.PackageSourceList, error)
-	LoadAvailablePackages() (*po.AvailablePackages, error)
 
-	SaveInstalledPackages(p *po.InstalledPackages) error
-	SavePackageSourceList(p *po.PackageSourceList) error
 	SaveAvailablePackages(p *po.AvailablePackages) error
+	SaveInstalledPackages(p *po.InstalledPackages) error
+	// SavePackageSourceList(p *po.PackageSourceList) error
 
 	SelectAvailablePackages(namelist []string) ([]*entity.AvailablePackageInfo, error)
 	SelectInstalledPackages(namelist []string) ([]*entity.InstalledPackageInfo, error)
@@ -57,15 +57,12 @@ func (inst *PackageManagerImpl) LoadInstalledPackages() (*po.InstalledPackages, 
 // LoadPackageSourceList ...
 func (inst *PackageManagerImpl) LoadPackageSourceList() (*po.PackageSourceList, error) {
 	file := inst.Env.GetSourcesFile()
-	props, err := inst.loadProperties(file)
+	list, err := convert.LoadPackageSourceList(file)
 	if err != nil {
 		return nil, err
 	}
 	o := &po.PackageSourceList{}
-	err = convert.LoadPackageSourceList(o, props)
-	if err != nil {
-		return nil, err
-	}
+	o.Sources = list
 	return o, nil
 }
 
@@ -95,16 +92,16 @@ func (inst *PackageManagerImpl) SaveInstalledPackages(o *po.InstalledPackages) e
 	return inst.saveProperties(props, file)
 }
 
-// SavePackageSourceList ...
-func (inst *PackageManagerImpl) SavePackageSourceList(o *po.PackageSourceList) error {
-	file := inst.Env.GetSourcesFile()
-	props := collection.CreateProperties()
-	err := convert.SavePackageSourceList(o, props)
-	if err != nil {
-		return err
-	}
-	return inst.saveProperties(props, file)
-}
+// // SavePackageSourceList ...
+// func (inst *PackageManagerImpl) SavePackageSourceList(o *po.PackageSourceList) error {
+// 	file := inst.Env.GetSourcesFile()
+// 	props := collection.CreateProperties()
+// 	err := convert.SavePackageSourceList(o, props)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return inst.saveProperties(props, file)
+// }
 
 // SaveAvailablePackages ...
 func (inst *PackageManagerImpl) SaveAvailablePackages(o *po.AvailablePackages) error {

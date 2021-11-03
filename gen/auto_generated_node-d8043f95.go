@@ -68,6 +68,7 @@ type pComUpdateServiceImpl struct {
 type pComUpgradeServiceImpl struct {
 	instance *service0xa5f732.UpgradeServiceImpl
 	 markup0x23084a.Component `id:"bpm-upgrade-service" class:"bpm-service"`
+	Env service0xa5f732.EnvService `inject:"#bpm-env-service"`
 	PM service0xa5f732.PackageManager `inject:"#bpm-package-manager"`
 	FetchSer service0xa5f732.FetchService `inject:"#bpm-fetch-service"`
 	DeploySer service0xa5f732.DeployService `inject:"#bpm-deploy-service"`

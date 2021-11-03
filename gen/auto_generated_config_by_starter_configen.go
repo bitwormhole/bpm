@@ -30,90 +30,99 @@ func autoGenConfig(cb application.ConfigBuilder) error {
 		return err
 	}
 
-	// component: com1-command0xf0f741.BpmFetch
+	// component: com1-command0xf0f741.BpmAutoUpgrade
 	cominfobuilder.Next()
-	cominfobuilder.ID("com1-command0xf0f741.BpmFetch").Class("cli-handler").Aliases("").Scope("")
+	cominfobuilder.ID("com1-command0xf0f741.BpmAutoUpgrade").Class("cli-handler").Aliases("").Scope("")
+	cominfobuilder.Factory((&comFactory4pComBpmAutoUpgrade{}).init())
+	err = cominfobuilder.CreateTo(cb)
+	if err != nil {
+		return err
+	}
+
+	// component: com2-command0xf0f741.BpmFetch
+	cominfobuilder.Next()
+	cominfobuilder.ID("com2-command0xf0f741.BpmFetch").Class("cli-handler").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComBpmFetch{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com2-command0xf0f741.BpmHelp
+	// component: com3-command0xf0f741.BpmHelp
 	cominfobuilder.Next()
-	cominfobuilder.ID("com2-command0xf0f741.BpmHelp").Class("cli-handler").Aliases("").Scope("")
+	cominfobuilder.ID("com3-command0xf0f741.BpmHelp").Class("cli-handler").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComBpmHelp{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com3-command0xf0f741.BpmInstall
+	// component: com4-command0xf0f741.BpmInstall
 	cominfobuilder.Next()
-	cominfobuilder.ID("com3-command0xf0f741.BpmInstall").Class("cli-handler").Aliases("").Scope("")
+	cominfobuilder.ID("com4-command0xf0f741.BpmInstall").Class("cli-handler").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComBpmInstall{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com4-command0xf0f741.BpmMake
+	// component: com5-command0xf0f741.BpmMake
 	cominfobuilder.Next()
-	cominfobuilder.ID("com4-command0xf0f741.BpmMake").Class("cli-handler").Aliases("").Scope("")
+	cominfobuilder.ID("com5-command0xf0f741.BpmMake").Class("cli-handler").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComBpmMake{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com5-command0xf0f741.BpmPackInfo
+	// component: com6-command0xf0f741.BpmPackInfo
 	cominfobuilder.Next()
-	cominfobuilder.ID("com5-command0xf0f741.BpmPackInfo").Class("cli-handler").Aliases("").Scope("")
+	cominfobuilder.ID("com6-command0xf0f741.BpmPackInfo").Class("cli-handler").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComBpmPackInfo{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com6-command0xf0f741.BpmRun
+	// component: com7-command0xf0f741.BpmRun
 	cominfobuilder.Next()
-	cominfobuilder.ID("com6-command0xf0f741.BpmRun").Class("cli-handler").Aliases("").Scope("")
+	cominfobuilder.ID("com7-command0xf0f741.BpmRun").Class("cli-handler").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComBpmRun{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com7-command0xf0f741.BpmUpdate
+	// component: com8-command0xf0f741.BpmUpdate
 	cominfobuilder.Next()
-	cominfobuilder.ID("com7-command0xf0f741.BpmUpdate").Class("cli-handler").Aliases("").Scope("")
+	cominfobuilder.ID("com8-command0xf0f741.BpmUpdate").Class("cli-handler").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComBpmUpdate{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com8-command0xf0f741.BpmUpgrade
+	// component: com9-command0xf0f741.BpmUpgrade
 	cominfobuilder.Next()
-	cominfobuilder.ID("com8-command0xf0f741.BpmUpgrade").Class("cli-handler").Aliases("").Scope("")
+	cominfobuilder.ID("com9-command0xf0f741.BpmUpgrade").Class("cli-handler").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComBpmUpgrade{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com9-command0xf0f741.BpmVersion
+	// component: com10-command0xf0f741.BpmVersion
 	cominfobuilder.Next()
-	cominfobuilder.ID("com9-command0xf0f741.BpmVersion").Class("cli-handler").Aliases("").Scope("")
+	cominfobuilder.ID("com10-command0xf0f741.BpmVersion").Class("cli-handler").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComBpmVersion{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com10-command0xf0f741.Bpm
+	// component: com11-command0xf0f741.Bpm
 	cominfobuilder.Next()
-	cominfobuilder.ID("com10-command0xf0f741.Bpm").Class("cli-handler").Aliases("").Scope("")
+	cominfobuilder.ID("com11-command0xf0f741.Bpm").Class("cli-handler").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComBpm{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
@@ -311,7 +320,84 @@ func (inst * comFactory4pComMainLoop) getterForFieldContextSelector (context app
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComBpmFetch : the factory of component: com1-command0xf0f741.BpmFetch
+// comFactory4pComBpmAutoUpgrade : the factory of component: com1-command0xf0f741.BpmAutoUpgrade
+type comFactory4pComBpmAutoUpgrade struct {
+
+    mPrototype * command0xf0f741.BpmAutoUpgrade
+
+	
+	mServiceSelector config.InjectionSelector
+
+}
+
+func (inst * comFactory4pComBpmAutoUpgrade) init() application.ComponentFactory {
+
+	
+	inst.mServiceSelector = config.NewInjectionSelector("#bpm-upgrade-service",nil)
+
+
+	inst.mPrototype = inst.newObject()
+    return inst
+}
+
+func (inst * comFactory4pComBpmAutoUpgrade) newObject() * command0xf0f741.BpmAutoUpgrade {
+	return & command0xf0f741.BpmAutoUpgrade {}
+}
+
+func (inst * comFactory4pComBpmAutoUpgrade) castObject(instance application.ComponentInstance) * command0xf0f741.BpmAutoUpgrade {
+	return instance.Get().(*command0xf0f741.BpmAutoUpgrade)
+}
+
+func (inst * comFactory4pComBpmAutoUpgrade) GetPrototype() lang.Object {
+	return inst.mPrototype
+}
+
+func (inst * comFactory4pComBpmAutoUpgrade) NewInstance() application.ComponentInstance {
+	return config.SimpleInstance(inst, inst.newObject())
+}
+
+func (inst * comFactory4pComBpmAutoUpgrade) AfterService() application.ComponentAfterService {
+	return inst
+}
+
+func (inst * comFactory4pComBpmAutoUpgrade) Init(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComBpmAutoUpgrade) Destroy(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComBpmAutoUpgrade) Inject(instance application.ComponentInstance, context application.InstanceContext) error {
+	
+	obj := inst.castObject(instance)
+	obj.Service = inst.getterForFieldServiceSelector(context)
+	return context.LastError()
+}
+
+//getterForFieldServiceSelector
+func (inst * comFactory4pComBpmAutoUpgrade) getterForFieldServiceSelector (context application.InstanceContext) service0xa5f732.UpgradeService {
+
+	o1 := inst.mServiceSelector.GetOne(context)
+	o2, ok := o1.(service0xa5f732.UpgradeService)
+	if !ok {
+		eb := &util.ErrorBuilder{}
+		eb.Message("bad cast")
+		eb.Set("com", "com1-command0xf0f741.BpmAutoUpgrade")
+		eb.Set("field", "Service")
+		eb.Set("type1", "?")
+		eb.Set("type2", "service0xa5f732.UpgradeService")
+		context.HandleError(eb.Create())
+		return nil
+	}
+	return o2
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+// comFactory4pComBpmFetch : the factory of component: com2-command0xf0f741.BpmFetch
 type comFactory4pComBpmFetch struct {
 
     mPrototype * command0xf0f741.BpmFetch
@@ -374,7 +460,7 @@ func (inst * comFactory4pComBpmFetch) getterForFieldServiceSelector (context app
 	if !ok {
 		eb := &util.ErrorBuilder{}
 		eb.Message("bad cast")
-		eb.Set("com", "com1-command0xf0f741.BpmFetch")
+		eb.Set("com", "com2-command0xf0f741.BpmFetch")
 		eb.Set("field", "Service")
 		eb.Set("type1", "?")
 		eb.Set("type2", "service0xa5f732.FetchService")
@@ -388,7 +474,7 @@ func (inst * comFactory4pComBpmFetch) getterForFieldServiceSelector (context app
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComBpmHelp : the factory of component: com2-command0xf0f741.BpmHelp
+// comFactory4pComBpmHelp : the factory of component: com3-command0xf0f741.BpmHelp
 type comFactory4pComBpmHelp struct {
 
     mPrototype * command0xf0f741.BpmHelp
@@ -442,7 +528,7 @@ func (inst * comFactory4pComBpmHelp) Inject(instance application.ComponentInstan
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComBpmInstall : the factory of component: com3-command0xf0f741.BpmInstall
+// comFactory4pComBpmInstall : the factory of component: com4-command0xf0f741.BpmInstall
 type comFactory4pComBpmInstall struct {
 
     mPrototype * command0xf0f741.BpmInstall
@@ -505,7 +591,7 @@ func (inst * comFactory4pComBpmInstall) getterForFieldServiceSelector (context a
 	if !ok {
 		eb := &util.ErrorBuilder{}
 		eb.Message("bad cast")
-		eb.Set("com", "com3-command0xf0f741.BpmInstall")
+		eb.Set("com", "com4-command0xf0f741.BpmInstall")
 		eb.Set("field", "Service")
 		eb.Set("type1", "?")
 		eb.Set("type2", "service0xa5f732.InstallService")
@@ -519,7 +605,7 @@ func (inst * comFactory4pComBpmInstall) getterForFieldServiceSelector (context a
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComBpmMake : the factory of component: com4-command0xf0f741.BpmMake
+// comFactory4pComBpmMake : the factory of component: com5-command0xf0f741.BpmMake
 type comFactory4pComBpmMake struct {
 
     mPrototype * command0xf0f741.BpmMake
@@ -582,7 +668,7 @@ func (inst * comFactory4pComBpmMake) getterForFieldServiceSelector (context appl
 	if !ok {
 		eb := &util.ErrorBuilder{}
 		eb.Message("bad cast")
-		eb.Set("com", "com4-command0xf0f741.BpmMake")
+		eb.Set("com", "com5-command0xf0f741.BpmMake")
 		eb.Set("field", "Service")
 		eb.Set("type1", "?")
 		eb.Set("type2", "service0xa5f732.MakeService")
@@ -596,7 +682,7 @@ func (inst * comFactory4pComBpmMake) getterForFieldServiceSelector (context appl
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComBpmPackInfo : the factory of component: com5-command0xf0f741.BpmPackInfo
+// comFactory4pComBpmPackInfo : the factory of component: com6-command0xf0f741.BpmPackInfo
 type comFactory4pComBpmPackInfo struct {
 
     mPrototype * command0xf0f741.BpmPackInfo
@@ -659,7 +745,7 @@ func (inst * comFactory4pComBpmPackInfo) getterForFieldServiceSelector (context 
 	if !ok {
 		eb := &util.ErrorBuilder{}
 		eb.Message("bad cast")
-		eb.Set("com", "com5-command0xf0f741.BpmPackInfo")
+		eb.Set("com", "com6-command0xf0f741.BpmPackInfo")
 		eb.Set("field", "Service")
 		eb.Set("type1", "?")
 		eb.Set("type2", "service0xa5f732.PackInfoService")
@@ -673,7 +759,7 @@ func (inst * comFactory4pComBpmPackInfo) getterForFieldServiceSelector (context 
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComBpmRun : the factory of component: com6-command0xf0f741.BpmRun
+// comFactory4pComBpmRun : the factory of component: com7-command0xf0f741.BpmRun
 type comFactory4pComBpmRun struct {
 
     mPrototype * command0xf0f741.BpmRun
@@ -736,7 +822,7 @@ func (inst * comFactory4pComBpmRun) getterForFieldServiceSelector (context appli
 	if !ok {
 		eb := &util.ErrorBuilder{}
 		eb.Message("bad cast")
-		eb.Set("com", "com6-command0xf0f741.BpmRun")
+		eb.Set("com", "com7-command0xf0f741.BpmRun")
 		eb.Set("field", "Service")
 		eb.Set("type1", "?")
 		eb.Set("type2", "service0xa5f732.RunService")
@@ -750,7 +836,7 @@ func (inst * comFactory4pComBpmRun) getterForFieldServiceSelector (context appli
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComBpmUpdate : the factory of component: com7-command0xf0f741.BpmUpdate
+// comFactory4pComBpmUpdate : the factory of component: com8-command0xf0f741.BpmUpdate
 type comFactory4pComBpmUpdate struct {
 
     mPrototype * command0xf0f741.BpmUpdate
@@ -813,7 +899,7 @@ func (inst * comFactory4pComBpmUpdate) getterForFieldServiceSelector (context ap
 	if !ok {
 		eb := &util.ErrorBuilder{}
 		eb.Message("bad cast")
-		eb.Set("com", "com7-command0xf0f741.BpmUpdate")
+		eb.Set("com", "com8-command0xf0f741.BpmUpdate")
 		eb.Set("field", "Service")
 		eb.Set("type1", "?")
 		eb.Set("type2", "service0xa5f732.UpdateService")
@@ -827,7 +913,7 @@ func (inst * comFactory4pComBpmUpdate) getterForFieldServiceSelector (context ap
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComBpmUpgrade : the factory of component: com8-command0xf0f741.BpmUpgrade
+// comFactory4pComBpmUpgrade : the factory of component: com9-command0xf0f741.BpmUpgrade
 type comFactory4pComBpmUpgrade struct {
 
     mPrototype * command0xf0f741.BpmUpgrade
@@ -890,7 +976,7 @@ func (inst * comFactory4pComBpmUpgrade) getterForFieldServiceSelector (context a
 	if !ok {
 		eb := &util.ErrorBuilder{}
 		eb.Message("bad cast")
-		eb.Set("com", "com8-command0xf0f741.BpmUpgrade")
+		eb.Set("com", "com9-command0xf0f741.BpmUpgrade")
 		eb.Set("field", "Service")
 		eb.Set("type1", "?")
 		eb.Set("type2", "service0xa5f732.UpgradeService")
@@ -904,7 +990,7 @@ func (inst * comFactory4pComBpmUpgrade) getterForFieldServiceSelector (context a
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComBpmVersion : the factory of component: com9-command0xf0f741.BpmVersion
+// comFactory4pComBpmVersion : the factory of component: com10-command0xf0f741.BpmVersion
 type comFactory4pComBpmVersion struct {
 
     mPrototype * command0xf0f741.BpmVersion
@@ -968,7 +1054,7 @@ func (inst * comFactory4pComBpmVersion) getterForFieldContextSelector (context a
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComBpm : the factory of component: com10-command0xf0f741.Bpm
+// comFactory4pComBpm : the factory of component: com11-command0xf0f741.Bpm
 type comFactory4pComBpm struct {
 
     mPrototype * command0xf0f741.Bpm
@@ -1691,6 +1777,7 @@ type comFactory4pComUpgradeServiceImpl struct {
     mPrototype * service0xa5f732.UpgradeServiceImpl
 
 	
+	mEnvSelector config.InjectionSelector
 	mPMSelector config.InjectionSelector
 	mFetchSerSelector config.InjectionSelector
 	mDeploySerSelector config.InjectionSelector
@@ -1700,6 +1787,7 @@ type comFactory4pComUpgradeServiceImpl struct {
 func (inst * comFactory4pComUpgradeServiceImpl) init() application.ComponentFactory {
 
 	
+	inst.mEnvSelector = config.NewInjectionSelector("#bpm-env-service",nil)
 	inst.mPMSelector = config.NewInjectionSelector("#bpm-package-manager",nil)
 	inst.mFetchSerSelector = config.NewInjectionSelector("#bpm-fetch-service",nil)
 	inst.mDeploySerSelector = config.NewInjectionSelector("#bpm-deploy-service",nil)
@@ -1740,10 +1828,29 @@ func (inst * comFactory4pComUpgradeServiceImpl) Destroy(instance application.Com
 func (inst * comFactory4pComUpgradeServiceImpl) Inject(instance application.ComponentInstance, context application.InstanceContext) error {
 	
 	obj := inst.castObject(instance)
+	obj.Env = inst.getterForFieldEnvSelector(context)
 	obj.PM = inst.getterForFieldPMSelector(context)
 	obj.FetchSer = inst.getterForFieldFetchSerSelector(context)
 	obj.DeploySer = inst.getterForFieldDeploySerSelector(context)
 	return context.LastError()
+}
+
+//getterForFieldEnvSelector
+func (inst * comFactory4pComUpgradeServiceImpl) getterForFieldEnvSelector (context application.InstanceContext) service0xa5f732.EnvService {
+
+	o1 := inst.mEnvSelector.GetOne(context)
+	o2, ok := o1.(service0xa5f732.EnvService)
+	if !ok {
+		eb := &util.ErrorBuilder{}
+		eb.Message("bad cast")
+		eb.Set("com", "bpm-upgrade-service")
+		eb.Set("field", "Env")
+		eb.Set("type1", "?")
+		eb.Set("type2", "service0xa5f732.EnvService")
+		context.HandleError(eb.Create())
+		return nil
+	}
+	return o2
 }
 
 //getterForFieldPMSelector
