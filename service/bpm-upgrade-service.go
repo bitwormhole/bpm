@@ -15,7 +15,7 @@ type UpgradeService interface {
 	UpgradePackage(ctx context.Context, pack *entity.InstalledPackageInfo) error
 	UpgradePackages(ctx context.Context, packs []*entity.InstalledPackageInfo) error
 	UpgradeByNames(ctx context.Context, names []string) error
-	UpgradeAuto(ctx context.Context) error
+	UpgradeAuto(ctx context.Context, doUpdateFirst bool) error
 }
 
 // UpgradeServiceImpl 实现 UpgradeService
@@ -24,6 +24,7 @@ type UpgradeServiceImpl struct {
 
 	Env       EnvService     `inject:"#bpm-env-service"`
 	PM        PackageManager `inject:"#bpm-package-manager"`
+	UpdateSer UpdateService  `inject:"#bpm-update-service"`
 	FetchSer  FetchService   `inject:"#bpm-fetch-service"`
 	DeploySer DeployService  `inject:"#bpm-deploy-service"`
 }
@@ -38,7 +39,7 @@ func (inst *UpgradeServiceImpl) Upgrade(ctx context.Context, in *vo.Upgrade, out
 }
 
 // UpgradeAuto 自动升级
-func (inst *UpgradeServiceImpl) UpgradeAuto(ctx context.Context) error {
+func (inst *UpgradeServiceImpl) UpgradeAuto(ctx context.Context, doUpdateFirst bool) error {
 
 	// 从文件“etc/bpm/auto-upgrade”中读取要自动升级的包名
 	listfile := inst.Env.GetAutoUpgradeFile()
@@ -53,6 +54,14 @@ func (inst *UpgradeServiceImpl) UpgradeAuto(ctx context.Context) error {
 		packName = strings.TrimSpace(packName)
 		if packName != "" {
 			list2 = append(list2, packName)
+		}
+	}
+
+	if doUpdateFirst {
+		updateVO := &vo.Update{}
+		err = inst.UpdateSer.Update(ctx, updateVO, updateVO)
+		if err != nil {
+			return err
 		}
 	}
 

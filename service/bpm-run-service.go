@@ -12,6 +12,7 @@ import (
 	"github.com/bitwormhole/bpm/data/vo"
 	"github.com/bitwormhole/bpm/tools"
 	"github.com/bitwormhole/starter-cli/cli"
+	"github.com/bitwormhole/starter/application"
 	"github.com/bitwormhole/starter/collection"
 	"github.com/bitwormhole/starter/io/fs"
 	"github.com/bitwormhole/starter/markup"
@@ -25,8 +26,9 @@ type RunService interface {
 type RunServiceImpl struct {
 	markup.Component `id:"bpm-run-service" class:"bpm-service"`
 
-	PM  PackageManager `inject:"#bpm-package-manager"`
-	Env EnvService     `inject:"#bpm-env-service"`
+	PM      PackageManager      `inject:"#bpm-package-manager"`
+	Env     EnvService          `inject:"#bpm-env-service"`
+	Context application.Context `inject:"context"`
 }
 
 func (inst *RunServiceImpl) _Impl() RunService {
@@ -134,15 +136,13 @@ func (inst *myRunServiceTask) init() error {
 
 func (inst *myRunServiceTask) lookUpForWorkingDir() (fs.Path, error) {
 	selector := inst.targetScript
-	home := inst.theBitwormholeHome
-	dir := home.GetChild(selector.WorkingDirectory)
+	dir := fs.Default().GetPath(selector.WorkingDirectory)
 	return dir, nil
 }
 
 func (inst *myRunServiceTask) lookUpForExeFile() (fs.Path, error) {
 	selector := inst.targetScript
-	home := inst.theBitwormholeHome
-	file := home.GetChild(selector.Executable)
+	file := fs.Default().GetPath(selector.Executable)
 	return file, nil
 }
 
@@ -260,6 +260,12 @@ func (inst *myRunServiceTask) loadMainConfig() error {
 
 	sum := tools.ComputeSHA256sumForBytes(data)
 
+	inst.injectEnvToProperties(props)
+	err = tools.ResolveConfig(props)
+	if err != nil {
+		return err
+	}
+
 	err = convert.LoadMainConfig(&inst.mainConfigModel, props)
 	if err != nil {
 		return err
@@ -270,6 +276,11 @@ func (inst *myRunServiceTask) loadMainConfig() error {
 	inst.mainConfigFile = file
 	inst.mainConfigSumHave = sum
 	return nil
+}
+
+func (inst *myRunServiceTask) injectEnvToProperties(props collection.Properties) {
+	env := inst.parent.Context.GetEnvironment()
+	tools.InjectEnvToProperties(props, env)
 }
 
 func (inst *myRunServiceTask) loadPackInfo() error {

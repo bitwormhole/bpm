@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/bitwormhole/bpm/data/convert"
 	"github.com/bitwormhole/bpm/data/entity"
@@ -119,7 +120,7 @@ func (inst *deployServiceTask) run() error {
 	// 检查是否需要skip当前的部署
 	accepted := inst.filter.AcceptDeploy(inst.pack80, inst.pack81)
 	if !accepted {
-		inst.console.WriteString(" ... skip deploying.\n")
+		inst.console.WriteString(" ... [skip]\n")
 		return nil
 	}
 
@@ -177,7 +178,7 @@ func (inst *deployServiceTask) init() error {
 
 func (inst *deployServiceTask) done() error {
 	if inst.err == nil {
-		msg := " ... deploying is success."
+		msg := " ... [success]"
 		inst.console.WriteString(msg + "\n")
 	}
 	return inst.err
@@ -187,8 +188,9 @@ func (inst *deployServiceTask) logTodo() {
 	pkg := inst.pack81
 	name := pkg.Name
 	version := pkg.Version
-	msg := "deploy package: " + name + "@" + version
-	inst.console.WriteString(msg + " ...\n")
+	rev := pkg.Revision
+	msg := fmt.Sprint("deploy package: ", name, "@"+version, " (r", rev, ")")
+	inst.console.WriteString(msg)
 }
 
 func (inst *deployServiceTask) AcceptDeploy(installed *entity.InstalledPackageInfo, available *entity.AvailablePackageInfo) bool {

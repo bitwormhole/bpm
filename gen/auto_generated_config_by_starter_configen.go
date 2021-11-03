@@ -1583,6 +1583,7 @@ type comFactory4pComRunServiceImpl struct {
 	
 	mPMSelector config.InjectionSelector
 	mEnvSelector config.InjectionSelector
+	mContextSelector config.InjectionSelector
 
 }
 
@@ -1591,6 +1592,7 @@ func (inst * comFactory4pComRunServiceImpl) init() application.ComponentFactory 
 	
 	inst.mPMSelector = config.NewInjectionSelector("#bpm-package-manager",nil)
 	inst.mEnvSelector = config.NewInjectionSelector("#bpm-env-service",nil)
+	inst.mContextSelector = config.NewInjectionSelector("context",nil)
 
 
 	inst.mPrototype = inst.newObject()
@@ -1630,6 +1632,7 @@ func (inst * comFactory4pComRunServiceImpl) Inject(instance application.Componen
 	obj := inst.castObject(instance)
 	obj.PM = inst.getterForFieldPMSelector(context)
 	obj.Env = inst.getterForFieldEnvSelector(context)
+	obj.Context = inst.getterForFieldContextSelector(context)
 	return context.LastError()
 }
 
@@ -1667,6 +1670,11 @@ func (inst * comFactory4pComRunServiceImpl) getterForFieldEnvSelector (context a
 		return nil
 	}
 	return o2
+}
+
+//getterForFieldContextSelector
+func (inst * comFactory4pComRunServiceImpl) getterForFieldContextSelector (context application.InstanceContext) application.Context {
+    return context.Context()
 }
 
 
@@ -1779,6 +1787,7 @@ type comFactory4pComUpgradeServiceImpl struct {
 	
 	mEnvSelector config.InjectionSelector
 	mPMSelector config.InjectionSelector
+	mUpdateSerSelector config.InjectionSelector
 	mFetchSerSelector config.InjectionSelector
 	mDeploySerSelector config.InjectionSelector
 
@@ -1789,6 +1798,7 @@ func (inst * comFactory4pComUpgradeServiceImpl) init() application.ComponentFact
 	
 	inst.mEnvSelector = config.NewInjectionSelector("#bpm-env-service",nil)
 	inst.mPMSelector = config.NewInjectionSelector("#bpm-package-manager",nil)
+	inst.mUpdateSerSelector = config.NewInjectionSelector("#bpm-update-service",nil)
 	inst.mFetchSerSelector = config.NewInjectionSelector("#bpm-fetch-service",nil)
 	inst.mDeploySerSelector = config.NewInjectionSelector("#bpm-deploy-service",nil)
 
@@ -1830,6 +1840,7 @@ func (inst * comFactory4pComUpgradeServiceImpl) Inject(instance application.Comp
 	obj := inst.castObject(instance)
 	obj.Env = inst.getterForFieldEnvSelector(context)
 	obj.PM = inst.getterForFieldPMSelector(context)
+	obj.UpdateSer = inst.getterForFieldUpdateSerSelector(context)
 	obj.FetchSer = inst.getterForFieldFetchSerSelector(context)
 	obj.DeploySer = inst.getterForFieldDeploySerSelector(context)
 	return context.LastError()
@@ -1865,6 +1876,24 @@ func (inst * comFactory4pComUpgradeServiceImpl) getterForFieldPMSelector (contex
 		eb.Set("field", "PM")
 		eb.Set("type1", "?")
 		eb.Set("type2", "service0xa5f732.PackageManager")
+		context.HandleError(eb.Create())
+		return nil
+	}
+	return o2
+}
+
+//getterForFieldUpdateSerSelector
+func (inst * comFactory4pComUpgradeServiceImpl) getterForFieldUpdateSerSelector (context application.InstanceContext) service0xa5f732.UpdateService {
+
+	o1 := inst.mUpdateSerSelector.GetOne(context)
+	o2, ok := o1.(service0xa5f732.UpdateService)
+	if !ok {
+		eb := &util.ErrorBuilder{}
+		eb.Message("bad cast")
+		eb.Set("com", "bpm-upgrade-service")
+		eb.Set("field", "UpdateSer")
+		eb.Set("type1", "?")
+		eb.Set("type2", "service0xa5f732.UpdateService")
 		context.HandleError(eb.Create())
 		return nil
 	}

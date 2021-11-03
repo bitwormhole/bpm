@@ -103,7 +103,8 @@ func (inst *fetchServiceTask) fetchPack(pack *entity.AvailablePackageInfo) error
 
 	// check cached
 	if inst.existsFile(bpmFile, wantSum) {
-		inst.console.WriteString("cached package:" + pack.Name + "@" + pack.Version + "\n")
+		rev := " (r" + strconv.Itoa(pack.Revision) + ")"
+		inst.console.WriteString("cached package: " + pack.Name + "@" + pack.Version + rev + "\n")
 		return nil
 	}
 

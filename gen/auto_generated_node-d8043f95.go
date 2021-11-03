@@ -54,6 +54,7 @@ type pComRunServiceImpl struct {
 	 markup0x23084a.Component `id:"bpm-run-service" class:"bpm-service"`
 	PM service0xa5f732.PackageManager `inject:"#bpm-package-manager"`
 	Env service0xa5f732.EnvService `inject:"#bpm-env-service"`
+	Context application0x67f6c5.Context `inject:"context"`
 }
 
 
@@ -70,6 +71,7 @@ type pComUpgradeServiceImpl struct {
 	 markup0x23084a.Component `id:"bpm-upgrade-service" class:"bpm-service"`
 	Env service0xa5f732.EnvService `inject:"#bpm-env-service"`
 	PM service0xa5f732.PackageManager `inject:"#bpm-package-manager"`
+	UpdateSer service0xa5f732.UpdateService `inject:"#bpm-update-service"`
 	FetchSer service0xa5f732.FetchService `inject:"#bpm-fetch-service"`
 	DeploySer service0xa5f732.DeployService `inject:"#bpm-deploy-service"`
 }

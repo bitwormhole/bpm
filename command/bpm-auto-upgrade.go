@@ -1,6 +1,8 @@
 package command
 
 import (
+	"strings"
+
 	"github.com/bitwormhole/bpm/service"
 	"github.com/bitwormhole/starter-cli/cli"
 	"github.com/bitwormhole/starter/markup"
@@ -22,5 +24,16 @@ func (inst *BpmAutoUpgrade) Init(service cli.Service) error {
 }
 
 func (inst *BpmAutoUpgrade) Handle(ctx *cli.TaskContext) error {
-	return inst.Service.UpgradeAuto(ctx.Context)
+	args := ctx.CurrentTask.Arguments
+	doUpdate := inst.getArgDoUpdate(args)
+	return inst.Service.UpgradeAuto(ctx.Context, doUpdate)
+}
+
+func (inst *BpmAutoUpgrade) getArgDoUpdate(args []string) bool {
+	for _, str := range args {
+		if strings.Contains(str, "update") {
+			return true
+		}
+	}
+	return false
 }
