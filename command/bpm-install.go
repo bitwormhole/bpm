@@ -24,8 +24,13 @@ func (inst *BpmInstall) Init(service cli.Service) error {
 
 func (inst *BpmInstall) Handle(ctx *cli.TaskContext) error {
 
+	a2, err := parseArguments(ctx.CurrentTask.Arguments)
+	if err != nil {
+		return err
+	}
+
 	in := vo.Install{}
 	out := vo.Install{}
-	in.PackageNames = getPackageNameListFromArgs(ctx.CurrentTask.Arguments)
+	in.PackageNames = a2.Packages
 	return inst.Service.Install(ctx.Context, &in, &out)
 }

@@ -24,8 +24,13 @@ func (inst *BpmPackInfo) Init(service cli.Service) error {
 
 func (inst *BpmPackInfo) Handle(ctx *cli.TaskContext) error {
 
+	a2, err := parseArguments(ctx.CurrentTask.Arguments)
+	if err != nil {
+		return err
+	}
+
 	in := vo.PackInfo{}
 	out := vo.PackInfo{}
-	in.PackageNames = getPackageNameListFromArgs(ctx.CurrentTask.Arguments)
+	in.PackageNames = a2.Packages
 	return inst.Service.DisplayPackInfo(ctx.Context, &in, &out)
 }

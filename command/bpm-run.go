@@ -1,6 +1,9 @@
 package command
 
 import (
+	"errors"
+	"strings"
+
 	"github.com/bitwormhole/bpm/data/vo"
 	"github.com/bitwormhole/bpm/service"
 	"github.com/bitwormhole/starter-cli/cli"
@@ -24,21 +27,44 @@ func (inst *BpmRun) Init(service cli.Service) error {
 
 func (inst *BpmRun) Handle(ctx *cli.TaskContext) error {
 
-	// bpm-run [package] [script]
+	// bpm-run [package:script]
 
-	args := ctx.CurrentTask.Arguments
-
+	pack, script, args, err := inst.parseArgs(ctx.CurrentTask.Arguments)
+	if err != nil {
+		return err
+	}
 	in := vo.Run{}
 	out := vo.Run{}
-	in.PackageName = inst.getArgAt(1, args)
-	in.ScriptName = inst.getArgAt(2, args)
+	in.PackageName = pack
+	in.ScriptName = script
 	in.Arguments = args
 	return inst.Service.Run(ctx.Context, &in, &out)
 }
 
-func (inst *BpmRun) getArgAt(index int, args []string) string {
-	if index < len(args) {
-		return args[index]
+// @return ( package, script, args2, error )
+func (inst *BpmRun) parseArgs(args []string) (string, string, []string, error) {
+
+	// args like 'bpm run package:script [args2...]'
+	const psIndex = 1 // the index of 'package:script'
+
+	if psIndex < len(args) {
+		ps := args[psIndex]
+		psArray := strings.Split(ps, ":")
+		if len(psArray) == 2 {
+			pack := psArray[0]
+			script := psArray[1]
+			return pack, script, args[psIndex+1:], nil
+		}
 	}
-	return ""
+
+	msg := "bad format of arguments"
+	want := ", want: 'bpm run {package}:{script} [args...]'"
+	have := strings.Builder{}
+	have.WriteString(", have: '")
+	for _, item := range args {
+		have.WriteString(item)
+		have.WriteRune(' ')
+	}
+	have.WriteString("'")
+	return "", "", nil, errors.New(msg + want + have.String())
 }

@@ -23,8 +23,14 @@ func (inst *BpmFetch) Init(service cli.Service) error {
 }
 
 func (inst *BpmFetch) Handle(ctx *cli.TaskContext) error {
+
+	a2, err := parseArguments(ctx.CurrentTask.Arguments)
+	if err != nil {
+		return err
+	}
+
 	in := vo.Fetch{}
 	out := vo.Fetch{}
-	in.PackageNames = getPackageNameListFromArgs(ctx.CurrentTask.Arguments)
+	in.PackageNames = a2.Packages
 	return inst.Service.Fetch(ctx.Context, &in, &out)
 }

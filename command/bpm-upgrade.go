@@ -24,8 +24,13 @@ func (inst *BpmUpgrade) Init(service cli.Service) error {
 
 func (inst *BpmUpgrade) Handle(ctx *cli.TaskContext) error {
 
+	args, err := parseArguments(ctx.CurrentTask.Arguments)
+	if err != nil {
+		return err
+	}
+
 	in := vo.Upgrade{}
 	out := vo.Upgrade{}
-	in.PackageNames = getPackageNameListFromArgs(ctx.CurrentTask.Arguments)
+	in.PackageNames = args.Packages
 	return inst.Service.Upgrade(ctx.Context, &in, &out)
 }

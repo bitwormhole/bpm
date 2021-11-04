@@ -8,6 +8,7 @@ import (
 	"github.com/bitwormhole/starter/markup"
 )
 
+// BpmVersion ...
 type BpmVersion struct {
 	markup.Component `class:"cli-handler"`
 
@@ -18,12 +19,14 @@ func (inst *BpmVersion) _Impl() cli.Handler {
 	return inst
 }
 
+// Init ...
 func (inst *BpmVersion) Init(service cli.Service) error {
 	service.RegisterHandler("bpm-version", inst)
 	service.RegisterHandler("bpm-about", inst)
 	return nil
 }
 
+// Handle ...
 func (inst *BpmVersion) Handle(ctx *cli.TaskContext) error {
 
 	const bitHome = "BITWORMHOLE_HOME"

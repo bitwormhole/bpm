@@ -2,9 +2,9 @@ package command
 
 import (
 	"errors"
-	"strings"
 
 	"github.com/bitwormhole/starter-cli/cli"
+	"github.com/bitwormhole/starter/collection"
 	"github.com/bitwormhole/starter/markup"
 )
 
@@ -25,45 +25,62 @@ func (inst *Bpm) Handle(ctx *cli.TaskContext) error {
 	cc := ctx.Context
 	client := ctx.Service.GetClient(cc)
 	args1 := ctx.CurrentTask.Arguments
-	cmd2, args2, err := inst.parseArgs(args1)
+	action, args2, err := inst.parseArgs(args1)
 	if err != nil {
 		return err
 	}
-	if cmd2 == "" {
-		cmd2 = "help"
-	}
-	return client.Execute("bpm-"+cmd2, args2)
+	return client.Execute("bpm-"+action, args2)
 }
 
+// @return( action , args2 , error)
 func (inst *Bpm) parseArgs(args []string) (string, []string, error) {
 	if args == nil {
 		return "", nil, errors.New("no args")
 	}
-	const index = 1 // index of c2
-	c2 := ""
+	const actionIndex = 1 // index of c2
+	action := "help"
 	a2 := []string{}
-	if index < len(args) {
-		c2 = args[index]
-		a2 = args[index+1:]
+	if actionIndex < len(args) {
+		action = args[actionIndex]
+		a2 = args[actionIndex+1:]
 	}
-	return c2, a2, nil
+	return action, a2, nil
 }
 
-func getPackageNameListFromArgs(args []string) []string {
-	list := make([]string, 0)
-	if args == nil {
-		return list
+////////////////////////////////////////////////////////////////////////////////
+
+type BpmArguments struct {
+	Action   string
+	Packages []string
+}
+
+func parseArguments(args []string) (*BpmArguments, error) {
+
+	dst := &BpmArguments{}
+	a2 := collection.InitArguments(args)
+	rd := a2.NewReader()
+
+	// for flags
+	flagExample := rd.GetFlag("--example")
+	if flagExample.Exists() {
+		// todo ...
 	}
-	const wantIndex = 1
-	if len(args) <= wantIndex {
-		return list
-	}
-	src := args[wantIndex:]
-	for _, item := range src {
-		if strings.HasPrefix(item, "-") {
-			continue
+
+	// for packs
+	packs := make([]string, 0)
+	for i := 0; ; i++ {
+		item, ok := rd.PickNext()
+		if ok {
+			if i == 0 {
+				dst.Action = item
+			} else {
+				packs = append(packs, item)
+			}
+		} else {
+			break
 		}
-		list = append(list, item)
 	}
-	return list
+
+	dst.Packages = packs
+	return dst, nil
 }

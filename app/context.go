@@ -10,7 +10,7 @@ import (
 	"github.com/bitwormhole/starter/contexts"
 )
 
-func prepareContext(ctx application.Context) (context.Context, error) {
+func PrepareContext(ctx application.Context) (context.Context, error) {
 
 	contexts.SetupContextSetter(&myContextSetter{ac: ctx})
 	contexts.SetupApplicationContext(ctx)

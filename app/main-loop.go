@@ -1,31 +1,50 @@
 package app
 
 import (
+	"errors"
 	"os"
 
 	"github.com/bitwormhole/starter-cli/cli"
 	"github.com/bitwormhole/starter/application"
-	"github.com/bitwormhole/starter/markup"
 )
 
-type MainLoop struct {
-	markup.Component `class:"looper"`
-
-	ClientFactory cli.ClientFactory   `inject:"#cli-client-factory"`
-	Context       application.Context `inject:"context"`
+type Runner struct {
+	i application.Initializer
 }
 
-func (inst *MainLoop) _Impl() application.Looper {
-	return inst
+func (inst *Runner) Init(i application.Initializer) {
+	inst.i = i
 }
 
-func (inst *MainLoop) Loop() error {
+func (inst *Runner) Run() error {
 
-	ctx, err := prepareContext(inst.Context)
+	rt, err := inst.i.RunEx()
 	if err != nil {
 		return err
 	}
 
-	client := inst.ClientFactory.CreateClient(ctx)
-	return client.Execute("bpm", os.Args[1:])
+	appctx := rt.Context()
+	ctx, err := PrepareContext(appctx)
+	if err != nil {
+		return err
+	}
+
+	o1, err := appctx.GetComponent("#cli-client-factory")
+	if err != nil {
+		return err
+	}
+
+	o2, ok := o1.(cli.ClientFactory)
+	if !ok {
+		return errors.New("o1.(cli.ClientFactory) cast fail")
+	}
+
+	args := os.Args[1:]
+	client := o2.CreateClient(ctx)
+	err = client.Execute("bpm", args)
+	if err != nil {
+		return err
+	}
+
+	return rt.Exit()
 }
