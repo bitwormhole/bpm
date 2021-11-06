@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"os"
 	"os/exec"
 	"strings"
 
@@ -360,7 +361,15 @@ func (inst *myRunServiceTask) execute() error {
 		return err
 	}
 
-	return cmd.Wait()
+	err = cmd.Wait()
+	if err != nil {
+		return err
+	}
+
+	state := cmd.ProcessState
+	code := state.ExitCode()
+	os.Exit(code)
+	return nil
 }
 
 ////////////////////////////////////////////////////////////////////////////////
