@@ -279,6 +279,7 @@ func doManifestItemLS(save bool, id string, o *entity.ManifestItem, props collec
 	a.ForString(&o.SHA256, "sha256sum")
 	a.ForInt64(&o.Size, "size")
 	a.ForBool(&o.IsDir, "isdir")
+	a.ForBool(&o.IsOverride, "override")
 
 	o.ID = id
 	return nil

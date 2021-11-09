@@ -79,17 +79,19 @@ type myMakeServiceTask struct {
 	theBpmConfigFile fs.Path
 	theFilesDir      fs.Path
 	theManifestFile  fs.Path
+	theFilelistFile  fs.Path
 	theSignatureFile fs.Path
 	theZipFile       fs.Path
 	thePackInfoFile  fs.Path
 
 	// data
-	timestamp   int64
-	itemIndexer int
-	packInfo    po.AvailablePackages
-	signature   po.Signature
-	manifest    po.Manifest // 生成的清单
-	config      po.Manifest // 配置的清单
+	timestamp     int64
+	itemIndexer   int
+	packInfo      po.AvailablePackages
+	signature     po.Signature
+	manifest      po.Manifest // 生成的清单
+	config        po.Manifest // 配置的清单
+	overrideTable map[string]bool
 }
 
 func (inst *myMakeServiceTask) run() error {
@@ -110,6 +112,11 @@ func (inst *myMakeServiceTask) run() error {
 	}
 
 	err = inst.makeSignature()
+	if err != nil {
+		return err
+	}
+
+	err = inst.makeFileList()
 	if err != nil {
 		return err
 	}
@@ -163,6 +170,7 @@ func (inst *myMakeServiceTask) initFiles(dotBpm fs.Path) error {
 	zipFileName := inst.makeOutputZipFileName()
 
 	// output
+	inst.theFilelistFile = dotBpm.GetChild("filelist")
 	inst.theManifestFile = dotBpm.GetChild("manifest")
 	inst.theSignatureFile = dotBpm.GetChild("signature")
 	inst.theZipFile = pdir.GetChild("dist/" + zipFileName)
@@ -291,6 +299,7 @@ func (inst *myMakeServiceTask) scanOnFile(file fs.Path, shortPath string) error 
 	item.Path = shortPath
 	item.SHA256 = sum
 	item.Size = file.Size()
+	item.IsOverride = inst.overrideTable[shortPath]
 
 	inst.addManifestItem(item)
 	return nil
@@ -337,7 +346,73 @@ func (inst *myMakeServiceTask) loadConfig() error {
 		return err
 	}
 
+	err = inst.loadOverrideTable(props)
+	if err != nil {
+		return err
+	}
+
 	return convert.LoadPackageManifest(&inst.config, props)
+}
+
+func (inst *myMakeServiceTask) loadOverrideTable(props collection.Properties) error {
+	const (
+		overYes = "override.yes."
+		overNo  = "override.no."
+	)
+	table := make(map[string]bool)
+	all := props.Export(nil)
+	for key, value := range all {
+		if strings.HasPrefix(key, overYes) {
+			table[value] = true
+		} else if strings.HasPrefix(key, overNo) {
+			table[value] = false
+		}
+	}
+	inst.overrideTable = table
+	return nil
+}
+
+func (inst *myMakeServiceTask) makeFileList() error {
+
+	files := make([]string, 0)
+	dirs := make([]string, 0)
+	builder := strings.Builder{}
+	manifest := &inst.manifest
+	items := manifest.Items
+
+	for _, item := range items {
+		if item.IsDir {
+			dirs = append(dirs, item.Path)
+		} else {
+			files = append(files, item.Path)
+		}
+	}
+
+	sort.Strings(dirs)
+	sort.Strings(files)
+	var index int = 0
+
+	builder.WriteString("[dirs]\n")
+	for _, path := range dirs {
+		index++
+		builder.WriteString(strconv.Itoa(index))
+		builder.WriteString("=")
+		builder.WriteString(path)
+		builder.WriteString("\n")
+	}
+
+	builder.WriteString("[files]\n")
+	for _, path := range files {
+		index++
+		builder.WriteString(strconv.Itoa(index))
+		builder.WriteString("=")
+		builder.WriteString(path)
+		builder.WriteString("\n")
+	}
+
+	text := builder.String()
+	file := inst.theFilelistFile
+	return file.GetIO().WriteText(text, nil, true)
 }
 
 func (inst *myMakeServiceTask) makeManifest() error {

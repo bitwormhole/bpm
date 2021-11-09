@@ -386,42 +386,57 @@ func (inst *deployServiceTask) checkFilesInPackage() error {
 }
 
 func (inst *deployServiceTask) moveFilesToDestination() error {
-
 	srcdir := inst.tmpDotBpmDir.GetChild("files")
 	dstdir := inst.parent.Env.GetBitwormholeHome()
 	list := inst.manifest.Items
-
 	for _, item := range list {
 		srcNode := srcdir.GetChild(item.Path)
 		dstNode := dstdir.GetChild(item.Path)
-
-		// for dir
 		if item.IsDir {
 			dstNode.Mkdirs()
-			continue
-		}
-
-		// for file
-		parentdir := dstNode.Parent()
-		if !parentdir.Exists() {
-			parentdir.Mkdirs()
-		}
-
-		err := srcNode.MoveTo(dstNode)
-		if err != nil {
-			return err
-		}
-
-		// check
-		haveSum, err := tools.ComputeSHA256sum(dstNode)
-		if err != nil {
-			return err
-		}
-		wantSum := item.SHA256
-		if wantSum != haveSum {
-			return errors.New("bad sha256sum, path=" + dstNode.Path())
+		} else {
+			err := inst.moveFileToDestination(item, dstNode, srcNode)
+			if err != nil {
+				return err
+			}
 		}
 	}
+	return nil
+}
+
+func (inst *deployServiceTask) moveFileToDestination(item *entity.ManifestItem, dst, src fs.Path) error {
+
+	if dst.Exists() {
+		vlog.Warn()
+		if item.IsOverride {
+			dst.Delete()
+			vlog.Warn("destination exists, override, dest=" + dst.Path())
+		} else {
+			vlog.Warn("destination exists, skip, dest=" + dst.Path())
+			return nil
+		}
+	}
+
+	parentdir := dst.Parent()
+	if !parentdir.Exists() {
+		parentdir.Mkdirs()
+	}
+
+	err := src.MoveTo(dst)
+	if err != nil {
+		return err
+	}
+
+	// check
+	haveSum, err := tools.ComputeSHA256sum(dst)
+	if err != nil {
+		return err
+	}
+	wantSum := item.SHA256
+	if wantSum != haveSum {
+		return errors.New("bad sha256sum, path=" + dst.Path())
+	}
+
 	return nil
 }
 
