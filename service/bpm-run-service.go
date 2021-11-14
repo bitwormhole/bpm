@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 	"strings"
@@ -322,6 +323,7 @@ func (inst *myRunServiceTask) checkFiles() error {
 
 	// todo ... check signature
 
+	inst.exeSumWant = executableSum
 	return nil
 }
 
@@ -338,11 +340,46 @@ func (inst *myRunServiceTask) printScriptParams() {
 	console.WriteString("\n\n")
 }
 
+func (inst *myRunServiceTask) prepareTempExeFile(srcExe fs.Path) (fs.Path, error) {
+
+	home := inst.theBitwormholeHome
+	sumWant := inst.exeSumWant
+	simpleName := srcExe.Name()
+	tmpExe := home.GetChild("tmp/exec.d/" + sumWant + "/" + simpleName)
+
+	if !tmpExe.Exists() {
+		dir := tmpExe.Parent()
+		if !dir.Exists() {
+			dir.Mkdirs()
+		}
+		err := srcExe.CopyTo(tmpExe)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	sumHave, err := tools.ComputeSHA256sum(tmpExe)
+	if err != nil {
+		return nil, err
+	}
+
+	if sumHave != sumWant {
+		msg := fmt.Sprint("bad sha-256 checksum of exe, want:", sumWant, " have:", sumHave)
+		return nil, errors.New(msg)
+	}
+
+	return tmpExe, nil
+}
+
 func (inst *myRunServiceTask) execute() error {
 
 	console := inst.console
 	wd := inst.exeWorkingDir
-	exefile := inst.exeFile
+
+	tmpExeFile, err := inst.prepareTempExeFile(inst.exeFile)
+	if err != nil {
+		return err
+	}
 
 	parser := cli.CommandLineParser{}
 	args, err := parser.Parse(inst.targetScript.Arguments)
@@ -350,7 +387,7 @@ func (inst *myRunServiceTask) execute() error {
 		return err
 	}
 
-	cmd := exec.Command(exefile.Path())
+	cmd := exec.Command(tmpExeFile.Path())
 	cmd.Dir = wd.Path()
 	cmd.Args = args
 	cmd.Stdout = console.Output()
