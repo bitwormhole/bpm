@@ -5,6 +5,7 @@ package gen
 
 import (
 	service0xa5f732 "github.com/bitwormhole/bpm/service"
+	assemblyline0x542798 "github.com/bitwormhole/bpm/service/impl/assemblyline"
 	application0x67f6c5 "github.com/bitwormhole/starter/application"
 	fs0x8698bb "github.com/bitwormhole/starter/io/fs"
 	markup0x23084a "github.com/bitwormhole/starter/markup"
@@ -82,6 +83,12 @@ type pComEnvServiceImpl struct {
 	 markup0x23084a.Component `id:"bpm-env-service" initMethod:"Init"`
 	Context application0x67f6c5.Context `inject:"context"`
 	home fs0x8698bb.Path ``
+}
+
+
+type pComAssemblyLineServiceImpl struct {
+	instance *assemblyline0x542798.AssemblyLineServiceImpl
+	 markup0x23084a.Component ` id:"bpm-assembly-line-service" class:"bpm-service" `
 }
 
 

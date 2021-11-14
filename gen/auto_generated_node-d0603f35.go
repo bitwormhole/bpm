@@ -51,6 +51,13 @@ type pComBpmPackInfo struct {
 }
 
 
+type pComBpmAssemblyLine struct {
+	instance *command0xf0f741.BpmAssemblyLine
+	 markup0x23084a.Component `class:"cli-handler"`
+	Service service0xa5f732.AssemblyLineService `inject:"#bpm-assembly-line-service"`
+}
+
+
 type pComBpmRun struct {
 	instance *command0xf0f741.BpmRun
 	 markup0x23084a.Component `class:"cli-handler"`
