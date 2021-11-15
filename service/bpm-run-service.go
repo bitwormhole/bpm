@@ -387,9 +387,10 @@ func (inst *myRunServiceTask) execute() error {
 		return err
 	}
 
-	cmd := exec.Command(tmpExeFile.Path())
+	cmd := exec.Command(tmpExeFile.Path(), args...)
+	// cmd.Path = tmpExeFile.Parent().Path()
+	// cmd.Args = args
 	cmd.Dir = wd.Path()
-	cmd.Args = args
 	cmd.Stdout = console.Output()
 	cmd.Stderr = console.Error()
 

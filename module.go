@@ -12,8 +12,8 @@ import (
 
 const (
 	myModuleName = "github.com/bitwormhole/bpm"
-	myModuleVer  = "v0.0.7"
-	myModuleRev  = 8
+	myModuleVer  = "v0.0.8"
+	myModuleRev  = 10
 )
 
 //go:embed src/main/resources

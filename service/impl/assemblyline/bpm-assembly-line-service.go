@@ -493,6 +493,9 @@ func (inst *assemblyLineTask) updatePackageList() error {
 	}
 
 	dstProps.Import(srcProps.Export(nil))
+	trimmer := distPackageListTrimmer{}
+	dstProps = trimmer.trim(dstProps)
+
 	text := collection.FormatPropertiesWithSegment(dstProps)
 	return dst.GetIO().WriteText(text, nil, false)
 }
